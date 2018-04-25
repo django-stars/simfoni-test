@@ -3,8 +3,7 @@
 // Variables should follow the `$component-state-property-size` formula for
 // consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
 
-$header-height: 56px;
-$footer-height: 48px;
+$header-height: 70px;
 
 //
 // Color system
@@ -21,7 +20,7 @@ $gray-600: #6c757d !default;
 $gray-700: #495057 !default;
 $gray-800: #343a40 !default;
 $gray-900: #212529 !default;
-$black:    #000 !default;
+$black:    #003e70;
 
 $grays: () !default;
 $grays: map-merge((
@@ -36,14 +35,14 @@ $grays: map-merge((
   "900": $gray-900
 ), $grays);
 
-$blue:    #007bff !default;
+$blue:    #ebf6ff;
 $indigo:  #6610f2 !default;
 $purple:  #6f42c1 !default;
 $pink:    #e83e8c !default;
 $red:     #dc3545 !default;
 $orange:  #fd7e14 !default;
 $yellow:  #ffc107 !default;
-$green:   #28a745 !default;
+$green:   #35cc5b;
 $teal:    #20c997 !default;
 $cyan:    #17a2b8 !default;
 
@@ -64,8 +63,8 @@ $colors: map-merge((
   "gray-dark":  $gray-800
 ), $colors);
 
-$primary:       $blue !default;
-$secondary:     $gray-600 !default;
+$primary:       #2196f3 ;
+$secondary:     $green;
 $success:       $green !default;
 $info:          $cyan !default;
 $warning:       $yellow !default;
@@ -207,7 +206,7 @@ $line-height-lg:              1.5 !default;
 $line-height-sm:              1.5 !default;
 
 $border-width:                1px !default;
-$border-color:                $gray-300 !default;
+$border-color:                #ebf7ff;
 
 $border-radius:               .25rem !default;
 $border-radius-lg:            .3rem !default;

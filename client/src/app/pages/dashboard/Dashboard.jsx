@@ -1,3 +1,16 @@
-export default function Dashboard(props) {
-  return <h1>{props.text}</h1>
+import { AppLayout } from 'layouts'
+import ChartContainer from './ChartContainer'
+import UploadContainer from './UploadContainer'
+import FormGroupsContainer from './FormGroupsContainer'
+
+export default function (props) {
+  return (
+    <AppLayout>
+      <div className='form-container'>
+        <UploadContainer />
+        <FormGroupsContainer />
+      </div>
+      <ChartContainer />
+    </AppLayout>
+  )
 }
