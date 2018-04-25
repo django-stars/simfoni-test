@@ -6,7 +6,7 @@ from revenue.api.serializers.revenue_group import RevenueGroupSerializer
 from revenue.models.revenue_group import RevenueGroup
 
 
-# APIViews was used instead of ViewSets because it's more verbose/explicit.
+# APIViews were used instead of ViewSets because it's more verbose/explicit.
 # Such declarative way is more clear to configure different permissions and serializers for each http method.
 # (when business logic becomes more complicated)
 
@@ -16,7 +16,7 @@ class RevenueGroupListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = RevenueGroupSerializer
 
 
-class RevenueGroupRetrieveUpdateDestroyAPIView(generics.ListCreateAPIView):
+class RevenueGroupRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RevenueGroupSerializer
 
 
