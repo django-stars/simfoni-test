@@ -1,5 +1,6 @@
 django>=2.0,<2.1
 djangorestframework>=3.8,<3.9
+openpyxl>=2.5,<2.6
 
 django-environ
 Pillow

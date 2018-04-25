@@ -1,15 +1,15 @@
-from django.conf.urls import url
+from django.urls import path
 
 from revenue.api import views
 
 
 urlpatterns = [
-    url(r'^revenue-groups/$', views.RevenueGroupListCreateAPIView.as_view(), name='revenue-group-list'),
-    url(
-        r'^revenue-groups/<uuid:pk>/$',
+    path('revenue-groups/', views.RevenueGroupListCreateAPIView.as_view(), name='revenue-group-list'),
+    path(
+        'revenue-groups/<uuid:pk>/',
         views.RevenueGroupRetrieveUpdateDestroyAPIView.as_view(),
         name='revenue-group-detail'
     ),
-    url(r'^revenue/$', views.RevenueRetrieveUploadAPIView.as_view(), name='revenue'),
+    path('revenue/', views.RevenueRetrieveUploadAPIView.as_view(), name='revenue'),
 
 ]
