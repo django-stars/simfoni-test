@@ -15,7 +15,15 @@ SECRET_KEY = 's0$ebu66nroo)y)0ejc^^@a^1y7y2fjrec(ak2mv))d%y0ngaa'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DJANGO_DEBUG', False)
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = env.list(
+    'ALLOWED_HOSTS',
+    default=[
+        '.localhost',
+        'localhost',
+        '*'
+    ]
+)
 
 
 # Application definition
@@ -29,9 +37,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'core',
     'revenue',
-    'data_import',
 ]
 
 if DEBUG:
