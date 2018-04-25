@@ -1,0 +1,114 @@
+.form-container {
+  width: 390px;
+  align-self: stretch;
+  background: #fff;
+  display: flex;
+  align-self: stretch;
+  flex-direction: column;
+  overflow: auto
+}
+
+.chart-container {
+  flex: 1;
+  align-self: stretch;
+  background: $blue;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  .header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    h1 {
+      font-size: 24px;
+      color: #003e70;
+    }
+  }
+  .chart-wrapper {
+    flex: 1;
+    align-self: stretch;
+    background: #fff;
+    margin-top: 20px;
+  }
+}
+
+.groups-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-self: stretch;
+  padding: 10px 8px 20px 8px;
+  .groups {
+    padding-top: 11px;
+    .groups-header {
+      display: flex;
+      flex-direction: row;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 28px;
+      color: #062d3f;
+      border-bottom: 1px solid $border-color;
+      span:not(:first-of-type) {
+        flex: 1
+      }
+      span:first-of-type {
+        width: 34px;
+        text-align: center;
+        opacity: 0.7;
+        font-weight: 400;
+      }
+    }
+    ul {
+      padding: 0;
+
+    }
+    .edit-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: nowrap;
+      padding: 14px 0;
+      background: $blue;
+      margin: 4px 0;
+      >div:not(:first-of-type) {
+        flex: 1;
+        display: flex;
+        padding-right: 10px;
+      }
+      >div:first-of-type {
+        width: 34px;
+        min-width: 34px;
+        text-align: center;
+        opacity: 0.7;
+        font-weight: 400;
+      }
+      .btn {
+        height: 36px;
+        width: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        border: 0;
+        background: #bde1ff;
+        margin-right: 14px;
+        &:hover {
+          background: $primary;
+          opacity: 1;
+        }
+      }
+    }
+  }
+  .empty-groups {
+    display: flex;
+    flex: 1;
+    align-self: stretch;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+    font-size: 16px;
+    color: #062d3f;
+  }
+}

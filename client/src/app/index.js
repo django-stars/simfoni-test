@@ -1,9 +1,9 @@
 import { render } from 'react-dom'
 
-import { store, history } from './init'
+import { store } from './init'
 import App from './App'
 
 render(
-  <App store={store} history={history} />,
-  document.getElementById('root'),
+  <App store={store} />,
+  document.getElementById('root')
 )

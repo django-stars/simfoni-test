@@ -20,8 +20,6 @@ import merge from 'lodash/merge'
 import values from 'lodash/values'
 import isEmpty from 'lodash/isEmpty'
 
-import { push, replace } from 'react-router-redux'
-
 // TODO
 // + OPTIONS request
 // + errors handling
@@ -48,72 +46,72 @@ export const SET_ERRORS = '@ds-resource/set-errors'
 export const SET_LOADING = '@ds-resource/set-loading'
 export const SET_FILTERS = '@ds-resource/set-filters'
 
-export function request(payload, meta) {
+export function request (payload, meta) {
   return {
     type: REQUEST,
     meta,
-    payload,
+    payload
   }
 }
 
-export function requestSuccess(payload, meta) {
+export function requestSuccess (payload, meta) {
   return {
     type: REQUEST_SUCCESS,
     meta,
-    payload,
+    payload
   }
 }
 
-export function requestError(payload, meta) {
+export function requestError (payload, meta) {
   return {
     type: REQUEST_ERROR,
     meta,
-    payload,
+    payload
   }
 }
 
-export function setData(payload, meta) {
+export function setData (payload, meta) {
   return {
     type: SET_DATA,
     meta,
-    payload,
+    payload
   }
 }
 
-export function setErrors(payload, meta) {
+export function setErrors (payload, meta) {
   return {
     type: SET_ERRORS,
     meta,
-    payload,
+    payload
   }
 }
 
-export function setLoading(payload, meta) {
+export function setLoading (payload, meta) {
   return {
     type: SET_LOADING,
     meta,
-    payload,
+    payload
   }
 }
 
-export function setFilters(payload, meta) {
+export function setFilters (payload, meta) {
   return {
     type: SET_FILTERS,
     meta,
-    payload,
+    payload
   }
 }
 
-export function filter(payload, meta) {
+export function filter (payload, meta) {
   return {
     type: FILTER,
     meta,
-    payload,
+    payload
   }
 }
 
-export function selectResource(resource) {
-  return function(state) {
+export function selectResource (resource) {
+  return function (state) {
     let resourceState = {
       // FIXME wrong place for default state
       data: null,
@@ -122,7 +120,7 @@ export function selectResource(resource) {
       errors: null,
       loading: 0,
       filters: { ...resource.filters },
-      ...state.resource[resource.namespace],
+      ...state.resource[resource.namespace]
     }
 
     return resourceState
@@ -134,7 +132,7 @@ export function selectResource(resource) {
 // 2. RESOURCE
 // 3. CONNECT PHASE
 
-export function connectResource(resource, options = {}) {
+export function connectResource (resource, options = {}) {
   // assert(resource, 'no resource set') // TODO
 
   resource = {
@@ -151,7 +149,7 @@ export function connectResource(resource, options = {}) {
     item: Boolean(options.form), // disallow binding list to form
 
     ...resource, // FIXME omit `item` here
-    ...options,
+    ...options
   }
 
   resource.namespace = getNamespace(resource)
@@ -172,21 +170,21 @@ export function connectResource(resource, options = {}) {
         fetchOptions: makePromisableRequestAction('OPTIONS', meta, dispatch),
         filter: makePromisableAction(
           (payload, reset = false) => filter(payload, { ...meta, reset }),
-          dispatch,
-        ),
+          dispatch
+        )
       }
 
       const restActions = {
         setData: payload => setData(payload, meta),
         setErrors: payload => setErrors(payload, meta),
-        setFilters: payload => setFilters(payload, meta),
+        setFilters: payload => setFilters(payload, meta)
       }
 
       const actions = {
         ...promiseableActions,
         ...bindActionCreators(restActions, dispatch),
         // aliases // TODO
-        save: promiseableActions.update,
+        save: promiseableActions.update
       }
 
       return actions
@@ -198,11 +196,11 @@ export function connectResource(resource, options = {}) {
         ...ownProps,
         [resource.namespace]: {
           ...stateProps,
-          ...dispatchProps,
-        },
+          ...dispatchProps
+        }
       })
 
-      if(resource.form) {
+      if (resource.form) {
         const isNew = !(
           // is list resource and ID presents
           (resource.list && ownProps[resource.idKey]) ||
@@ -212,73 +210,72 @@ export function connectResource(resource, options = {}) {
         props = {
           ...props,
           initialValues: stateProps.data,
-          onSubmit: isNew ? dispatchProps.create : dispatchProps.update,
+          onSubmit: isNew ? dispatchProps.create : dispatchProps.update
         }
       }
 
       return props
-    },
+    }
   )
 
-  if(!resource.prefetch) {
+  if (!resource.prefetch) {
     return connectHOC
   }
 
   return compose(
     connectHOC,
-    makePrefetchHOC(resource),
+    makePrefetchHOC(resource)
   )
 }
 
-export function connectFormResource(resource, options) {
-  if(!options.form) {
+export function connectFormResource (resource, options) {
+  if (!options.form) {
     // TODO assert
     throw new Error('no form name. you must specify form name for connectFormResource')
   }
   return connectResource(resource, { ...options })
 }
 
-export function connectListResource(resource, options) {
+export function connectListResource (resource, options) {
   return connectResource(resource, { ...options, list: true })
 }
 
-export function connectSingleResource(resource, options) {
+export function connectSingleResource (resource, options) {
   return connectResource(resource, options)
 }
 
-function makePrefetchHOC(resource) {
-  return function(ComposedComponent) {
+function makePrefetchHOC (resource) {
+  return function (ComposedComponent) {
     return class PrefetchResourceContainer extends Component {
-      componentDidMount() {
+      componentDidMount () {
         const hasData = this.props[resource.namespace].data !== null
         const hasOptions = this.props[resource.namespace].options !== null
         const hasId = Boolean(this.props[resource.idKey])
 
-        if((!hasData || resource.refresh) && (!resource.list || !resource.item || hasId)) {
-          if(resource.useRouter) {
+        if ((!hasData || resource.refresh) && (!resource.list || !resource.item || hasId)) {
+          if (resource.useRouter) {
             this.props[resource.namespace].setFilters({
               ...resource.filters, // default filters
-              ...parseQueryParams(location.search),
+              ...parseQueryParams(location.search)
             })
           }
           // fetch item
           this.props[resource.namespace].fetch()
-        } else if(!hasData) {
+        } else if (!hasData) {
           // register item
           this.props[resource.namespace].setData({})
         }
 
-
-        if(resource.options && !hasOptions) {
+        if (resource.options && !hasOptions) {
           this.props[resource.namespace].fetchOptions()
         }
       }
 
-      render() {
+      render () {
         const hasData = this.props[resource.namespace].data !== null
         const hasOptions = this.props[resource.namespace].options !== null
 
-        if(!resource.async && (!hasData || (resource.options && !hasOptions))) {
+        if (!resource.async && (!hasData || (resource.options && !hasOptions))) {
           return null // TODO loading
         }
 
@@ -289,25 +286,25 @@ function makePrefetchHOC(resource) {
 }
 
 const defaultState = {
-  isFetched: false,
+  isFetched: false
 }
 
-export function reducer(state = defaultState, { type, payload = {}, meta = {}, error = false }) {
+export function reducer (state = defaultState, { type, payload = {}, meta = {}, error = false }) {
   switch (type) {
     case SET_ERRORS:
     case SET_DATA: {
       const currentData = state[meta.resource.namespace]
       const dataKey = {
         [SET_DATA]: meta.type === 'OPTIONS' ? 'options' : 'data',
-        [SET_ERRORS]: 'errors',
+        [SET_ERRORS]: 'errors'
       }[type]
 
-      if(dataKey === 'options') {
+      if (dataKey === 'options') {
         payload = parseOptions(payload)
       }
 
       let count
-      if(dataKey === 'data' && meta.resource.list) {
+      if (dataKey === 'data' && meta.resource.list) {
         count = payload.results ? payload.count : payload.length
         payload = payload.results || payload
       }
@@ -317,8 +314,8 @@ export function reducer(state = defaultState, { type, payload = {}, meta = {}, e
         [meta.resource.namespace]: {
           ...currentData,
           count,
-          [dataKey]: payload,
-        },
+          [dataKey]: payload
+        }
       }
     }
 
@@ -326,7 +323,7 @@ export function reducer(state = defaultState, { type, payload = {}, meta = {}, e
       const currentData = state[meta.resource.namespace] || { loading: 0 }
       const loading = currentData.loading + payload
 
-      if(loading < 0) {
+      if (loading < 0) {
         console.warn('loading counter actions are inconsistent')
       }
 
@@ -335,8 +332,8 @@ export function reducer(state = defaultState, { type, payload = {}, meta = {}, e
         [meta.resource.namespace]: {
           ...currentData,
           isLoading: loading > 0,
-          loading,
-        },
+          loading
+        }
       }
     }
 
@@ -349,8 +346,8 @@ export function reducer(state = defaultState, { type, payload = {}, meta = {}, e
         ...state,
         [meta.resource.namespace]: {
           ...currentData,
-          filters: { ...filters, ...payload },
-        },
+          filters: { ...filters, ...payload }
+        }
       }
     }
   }
@@ -358,17 +355,17 @@ export function reducer(state = defaultState, { type, payload = {}, meta = {}, e
   return state
 }
 
-function requestEpic(action$, store, { API }) { // FIXME API
+function requestEpic (action$, store, { API }) { // FIXME API
   return action$.ofType(REQUEST)
     // .debounce(() => interval(100)) // FIXME: FAIL on different requests types
-    .mergeMap(function({ meta, payload }) {
+    .mergeMap(function ({ meta, payload }) {
       const { type, props, resource } = meta
 
       const isListItem = !resource.item && resource.list && ['PATCH', 'PUT', 'DELETE'].includes(type)
       let itemId = (isListItem ? payload : props)[resource.idKey]
 
       let endpoint = resource.endpoint
-      if(!(new RegExp(`(:${resource.idKey})\\W`, 'g').test(endpoint))) {
+      if (!(new RegExp(`(:${resource.idKey})\\W`, 'g').test(endpoint))) {
         // automatically set '/:id?' to endpoint
         endpoint += `/:${resource.idKey}?`
       }
@@ -381,63 +378,44 @@ function requestEpic(action$, store, { API }) { // FIXME API
       const query = resource.list && !hasId && !isListItem
         ? selectResource(resource)(store.getState()).filters
         : undefined
-
       return concat(
         of(
-          setLoading(+1, meta),
+          setLoading(+1, meta)
         ),
         fromPromise(API(endpoint).request(type, query, payload))
           .switchMap(response => of(
             // TODO update list after create new item (GET after POST)
-            isListItem
+            resource.requestPromise ? requestSuccess(response, meta) : isListItem
               ? request(undefined, { ...meta, type: 'GET' })
               : setData(response, meta),
             setLoading(-1, meta),
-            submitting && meta.resource.navigateAfterSubmit && push(meta.resource.navigateAfterSubmit),
-            requestSuccess(response, meta),
+            submitting && meta.resource.navigateAfterSubmit
           ))
           .catch(err => of(
             setErrors(err.errors || err, meta),
             setLoading(-1, meta),
-            requestError(err.errors || err, meta),
+            requestError(err.errors || err, meta)
           ))
       ).filter(Boolean)
     })
 }
 
-function filterEpic(action$, store) {
+function filterEpic (action$, store) {
   return action$.ofType(FILTER)
-    .mergeMap(function({ meta, payload }) {
+    .mergeMap(function ({ meta, payload }) {
       return (
         of(
           setFilters(payload, meta),
-          request(undefined, { ...meta, type: 'GET' }),
+          request(undefined, { ...meta, type: 'GET' })
         )
       )
     })
 }
 
-function navigateEpic(action$, store) {
-  return action$.ofType(SET_FILTERS)
-    .filter(({meta}) => meta.resource.useRouter)
-    .mergeMap(function({ meta, payload }) {
-      return (
-        of(
-          replace({
-            pathname: store.getState().router.location.pathname,
-            search: buildQueryParams(
-              selectResource(meta.resource)(store.getState()).filters
-            )
-          }),
-        )
-      )
-    })
-}
-
-function promiseResolveEpic(action$, store) {
+function promiseResolveEpic (action$, store) {
   return action$.ofType(REQUEST_ERROR, REQUEST_SUCCESS)
-    .mergeMap(function({ meta, payload, type }) {
-      if(meta.requestPromise) {
+    .mergeMap(function ({ meta, payload, type }) {
+      if (meta.requestPromise) {
         const callback = type === REQUEST_SUCCESS ? 'resolve' : 'reject'
         meta.requestPromise[callback](payload)
       }
@@ -445,17 +423,17 @@ function promiseResolveEpic(action$, store) {
     })
 }
 
-function getNamespace({ list, item, namespace }) {
-  if(!Array.isArray(namespace)) {
+function getNamespace ({ list, item, namespace }) {
+  if (!Array.isArray(namespace)) {
     namespace = [namespace, namespace]
   }
 
   return namespace[list && !item ? 0 : 1]
 }
 
-function makeRequestAction(type, meta) {
-  return function(payload, options) {
-    if(type === 'GET' && payload !== undefined) {
+function makeRequestAction (type, meta) {
+  return function (payload, options) {
+    if (type === 'GET' && payload !== undefined) {
       // TODO assert here
       console.warn('GET action should not contain request body')
     }
@@ -466,13 +444,13 @@ function makeRequestAction(type, meta) {
   }
 }
 
-function makePromisableRequestAction(type, meta, dispatch) {
+function makePromisableRequestAction (type, meta, dispatch) {
   const actionCreator = makeRequestAction(type, meta)
   return makePromisableAction(actionCreator, dispatch)
 }
 
-function makePromisableAction(actionCreator, dispatch) {
-  return function() {
+function makePromisableAction (actionCreator, dispatch) {
+  return function () {
     const {type, meta, payload} = actionCreator.apply(this, arguments)
     return new Promise((resolve, reject) => {
       const action = {
@@ -480,7 +458,7 @@ function makePromisableAction(actionCreator, dispatch) {
         payload,
         meta: {
           ...meta,
-          requestPromise: {resolve, reject},
+          requestPromise: {resolve, reject}
         }
       }
 
@@ -489,44 +467,43 @@ function makePromisableAction(actionCreator, dispatch) {
   }
 }
 
-function parseOptions(options) {
+function parseOptions (options) {
   return merge.apply(null, values(options.actions))
 }
 
 export const epic = combineEpics(
   requestEpic,
   filterEpic,
-  navigateEpic,
-  promiseResolveEpic,
+  promiseResolveEpic
 )
 
 // NOTE we use own copy of query utils here, because of camelCase dependency
 // TODO we can use something like 'query-string' instead
-function parseQueryParams(str) {
-  if(str.length <= 2) {
+function parseQueryParams (str) {
+  if (str.length <= 2) {
     return {} // '' || '?'
   }
 
   return str
     .substr(1) // symbol '?'
     .split('&')
-    .reduce(function(params, param) {
+    .reduce(function (params, param) {
       var paramSplit = param.split('=').map(function (chunk) {
         return decodeURIComponent(chunk.replace('+', '%20'))
-      });
+      })
       const name = paramSplit[0]
       const value = paramSplit[1]
       params[name] = params.hasOwnProperty(name) ? [].concat(params[name], value) : value
-      return params;
+      return params
     }, {})
 }
 
-function buildQueryParams(params) {
-  if(isEmpty(params)) {
+function buildQueryParams (params) {
+  if (isEmpty(params)) {
     return ''
   }
 
-  return Object.keys(params).reduce(function(ret, key) {
+  return Object.keys(params).reduce(function (ret, key) {
     let value = params[key]
 
     if (value == null || value == undefined) {
@@ -538,14 +515,13 @@ function buildQueryParams(params) {
     }
 
     value.forEach(function (val) {
-      if(String(val).length > 0) {
+      if (String(val).length > 0) {
         ret.push(
-          encodeURIComponent(key)
-          + '='
-          + encodeURIComponent(val)
+          encodeURIComponent(key) +
+          '=' +
+          encodeURIComponent(val)
         )
       }
-
     })
 
     return ret

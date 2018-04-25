@@ -9,6 +9,7 @@ const propTypes = {
   required: PropTypes.bool,
   disabled: PropTypes.bool,
   name: PropTypes.string,
+  onBlur: PropTypes.func,
   value: PropTypes.oneOfType([
     PropTypes.number,
     PropTypes.string,
@@ -16,29 +17,31 @@ const propTypes = {
 }
 const defaultProps = {
   inputClassName: 'input-custom',
+  onBlur: ()=>{}
 }
 
 export default class CurrencyInput extends Component {
-    @autobind
-  handleChange(e) {
-    this.props.onChange(e.target.value)
+  @autobind
+  handleChange({ value }, e) {
+    this.props.onChange(value)
   }
-    render() {
-      const { inputClassName, placeholder, required,
-        disabled, name, value } = this.props
-      return (
-        <NumberFormat
-          className={inputClassName}
-          placeholder={placeholder}
-          onChange={this.handleChange}
-          required={required}
-          disabled={disabled}
-          name={name}
-          value={value}
-          thousandSeparator="'"
-        />
-      )
-    }
+  render() {
+    const { inputClassName, placeholder, required,
+      disabled, name, value, onBlur } = this.props
+    return (
+      <NumberFormat
+        className={inputClassName}
+        placeholder={placeholder}
+        onValueChange={this.handleChange}
+        onBlur={onBlur}
+        required={required}
+        disabled={disabled}
+        name={name}
+        value={value}
+        thousandSeparator="'"
+      />
+    )
+  }
 }
 
 CurrencyInput.propTypes = propTypes

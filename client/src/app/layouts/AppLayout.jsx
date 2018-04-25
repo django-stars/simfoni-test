@@ -1,14 +1,12 @@
 import Header from './Header'
-import Footer from './Footer'
 
-export default function AppLayout({ children }) {
+export default function AppLayout ({ children }) {
   return (
-    <div className="wrapper">
+    <div className='wrapper'>
       <Header />
-      <div className="main">
+      <div className='main'>
         {children}
       </div>
-      <Footer />
     </div>
   )
 }

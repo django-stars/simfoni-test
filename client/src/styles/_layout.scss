@@ -1,22 +1,28 @@
 .wrapper {
   height: 100%;
   background-color: $gray-100;
+  display: flex;
+  flex-direction: column;
 }
 
 .main {
-  height: calc(100% - #{$header-height} - #{$footer-height});
-  overflow: auto;
+  min-height: calc(100% - #{$header-height});
+  display: flex;
+  flex: 1;
+  flex-direction: row;
 }
 
 header {
   height: $header-height;
-  background-color: #fff;
-  display: flex;
-  justify-content: space-around;
-}
-
-footer {
-  height: $footer-height;
   background-color: $primary;
-  color: #fff;
+  display: flex;
+  justify-content: flex-start;
+  padding: 17px 32px;
+  &:before {
+    content: '';
+    background: url('../img/logo.svg');
+    width: 137px;
+    background-size: center;
+    background-repeat: no-repeat;
+  }
 }
