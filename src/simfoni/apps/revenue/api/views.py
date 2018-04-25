@@ -29,7 +29,7 @@ class RevenueRetrieveUploadAPIView(APIView):
             data = {
                 group.name: 33
             }
-
+        # show not displayed?
         return Response(
             data,
             status=status.HTTP_200_OK
@@ -38,6 +38,7 @@ class RevenueRetrieveUploadAPIView(APIView):
     def post(self, request):
         upload_statistic = {
             'uploaded': 300,
+            'skip': 3,
             'min': 1000,
             'max': 10000,
         }
