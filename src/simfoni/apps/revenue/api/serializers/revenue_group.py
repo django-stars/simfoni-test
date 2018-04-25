@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from revenue.models.revenue_group import RevenueGroup
+from revenue.models import RevenueGroup
 
 
 class RevenueGroupSerializer(serializers.ModelSerializer):
