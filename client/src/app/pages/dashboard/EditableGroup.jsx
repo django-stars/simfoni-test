@@ -66,7 +66,7 @@ export default class EditableGroup extends PureComponent {
             onFocus={this.clearErrors}
           />
         </div>
-        <Button color='primary' onClick={this.validate}>+</Button>
+        <Button color='primary' onClick={this.validate}>&#10003;</Button>
         <Button color='primary' onClick={this.deleteGroup}>-</Button>
       </li>
     )

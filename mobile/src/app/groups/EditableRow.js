@@ -56,7 +56,7 @@ export default class EditableRow extends PureComponent {
           />
         </View>
         <Button buttonStyle={style.button} onPress={this.validate}>
-          <Text style={style.buttonText}>+</Text>
+          <Text style={style.buttonText}>&#10003;</Text>
         </Button>
         <Button buttonStyle={style.button} onPress={this.deleteGroup}>
           <Text style={style.buttonText}>-</Text>
