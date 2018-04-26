@@ -7,4 +7,4 @@ from core.models import AbstractBaseModel
 
 class Revenue(AbstractBaseModel):
     customer_name = models.CharField(_('Customer name'), max_length=255)
-    revenue = models.DecimalField(_('From'), max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+    revenue = models.DecimalField(_('Revenue'), max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])

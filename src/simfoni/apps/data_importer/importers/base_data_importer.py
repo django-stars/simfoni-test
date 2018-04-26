@@ -71,6 +71,7 @@ class BaseDataImporter(abc.ABC):
         if not self.is_parsed:
             assert self._is_valid is not None, 'You need to call is_valid before parsing.'
             assert self._is_valid, 'File structure doesn\'t correspond provided serializer. Check file content.'
+
             for row in self._iterator:
                 mapped_row = {
                     serializer_field: row.value for serializer_field, row in zip(
@@ -79,7 +80,7 @@ class BaseDataImporter(abc.ABC):
                 }
 
                 # some editors saves more than 1 million empty rows. So we stop parsing when find first empty row
-                if not all(mapped_row.values()):
+                if not any(mapped_row.values()):
                     break
 
                 row_serializer = self.serializer(data=mapped_row)
