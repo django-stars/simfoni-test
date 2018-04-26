@@ -6,7 +6,7 @@ import { AsyncStorage } from 'react-native'
 import storageMiddleware from './store/storage-middleware'
 import { reducers, epics } from './store'
 import { router, navigationMiddleware } from './rootNavigator'
-import { reducer as resources, epic as resourcesEpic } from './utils/resources'
+import { reducer as resource, epic as resourcesEpic } from './utils/resources'
 
 const initialState = router.getStateForAction(router.getActionForPathAndParams('UploadFile'))
 
@@ -21,13 +21,13 @@ const combinedReducers = combineReducers({
   nav,
   form,
   persisted,
-  resources,
+  resource,
   ...reducers
 })
 
 const PERSIST = 'SET_STORE'
 
-const appReducer = (state = {}, action) => {
+const appReducer = (state = { resource: {} }, action) => {
   switch (action.type) {
     case PERSIST:
       return {...state, ...action.payload, persisted: true}
@@ -49,7 +49,7 @@ const store = createStoreWithMiddleware(appReducer)
 
 AsyncStorage.getItem('state')
   .then(data => {
-    store.dispatch({ type: PERSIST, payload: { resources: data ? JSON.parse(data) : {} } })
+    store.dispatch({ type: PERSIST, payload: { resource: data ? JSON.parse(data) : {} } })
   })
 
 export default store

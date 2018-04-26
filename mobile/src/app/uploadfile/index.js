@@ -1,3 +1,3 @@
-import UploadFile from './UploadFile'
+import UploadFile from './UploadContainer'
 
 export default UploadFile

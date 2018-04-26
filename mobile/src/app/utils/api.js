@@ -30,7 +30,7 @@ function deepValues (obj) {
 
 function hasFile (obj) {
   // check if `obj` has at least one `File` instance
-  return deepValues(obj).some((v) => v instanceof File)
+  return !!obj.uri
 }
 
 class API {
@@ -46,41 +46,10 @@ class API {
       return body
     }
 
-    if (isPlainObject(body)) {
-      // FIXME we shouldn't send file object represented by url
-      ['avatar', 'logo', 'file'].forEach(field => isString(body[field]) && delete body[field])
-    }
-
     if (isMultipartFormData) {
-      const formData = new FormData()
-
-      for (var name in body) {
-        if (isFunction(body[name])) {
-          // FIXME there should not be functions
-          console.warn('API detects invalid data value (function) in field:', name)
-          continue
-        } else if (Array.isArray(body[name])) {
-          body[name].forEach((value, i) => {
-            if (isObject(value)) {
-              keys(value).forEach(key => {
-                formData.append(`${name}[${i}]${key}`, value[key])
-              })
-            } else {
-              formData.append(name, value)
-            }
-          })
-        } else if (isPlainObject(body[name])) {
-          keys(body[name]).forEach(key => {
-            formData.append(`${name}.${key}`, body[name][key])
-          })
-        } else {
-          if (body[name] !== null) {
-            // FIXME this shouldn't be here. check form body serialization
-            // https://github.com/erikras/redux-form/issues/701
-            formData.append(name, body[name])
-          }
-        }
-      }
+      var formData = new FormData()
+      let file = body
+      formData.append('file', file)
       return formData
     } else {
       return JSON.stringify(body)
@@ -126,16 +95,25 @@ class API {
   request (method, params = {}, body = {}) {
     const queryParams = isEmpty(params) ? '' : '?' + buildQueryParams(params)
     const resource = `${API_URL}/${this.endpoint}/${queryParams}`
-
+    let headers = {
+      'Content-Type': 'application/json'
+    }
     const isMultipartFormData = hasFile(body)
-    isMultipartFormData && headers.delete('Content-Type')
+    if (isMultipartFormData) {
+      headers = {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
 
     body = this.prepareBody(body, isMultipartFormData)
+    if (method === 'GET') body = undefined
     const options = {
       method,
       headers,
       body
     }
+
+    console.log({resource, options})
     return fetch(resource, options).then(this.handleResponseCallback)
   }
 

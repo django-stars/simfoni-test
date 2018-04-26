@@ -2,9 +2,9 @@ import React from 'react'
 import { PropTypes } from 'prop-types'
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
 
-export default function Header ({ children }) {
+export default function Header ({ children, headerStyle = {} }) {
   return (
-    <View style={style.main}>
+    <View style={[style.main, headerStyle]}>
       {children}
     </View>
   )
@@ -25,9 +25,13 @@ const style = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingHorizontal: styles.FONT_SIZE,
-    backgroundColor: styles.COLOR_PRIMARY,
-    paddingTop: styles.STATUSBAR_HEIGHT
+    backgroundColor: styles.COLOR_WHITE,
+    paddingTop: styles.STATUSBAR_HEIGHT,
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowOffset: {width: 0, height: 1}
   }
 })

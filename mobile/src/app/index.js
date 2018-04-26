@@ -13,7 +13,6 @@ export default class StoryToldApp extends Component {
 
   componentDidMount () {
     Keyboard.addListener('keyboardDidHide', this.blurInputs)
-    StatusBar.setBarStyle('light-content')
     if (Platform.OS !== 'ios') {
       StatusBar.setTranslucent(true)
       StatusBar.setBackgroundColor('rgba(0,0,0,0.2)')

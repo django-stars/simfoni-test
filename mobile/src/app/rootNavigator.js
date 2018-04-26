@@ -39,14 +39,15 @@ const options = {
   tabBarPosition: 'bottom',
   swipeEnabled: true,
   animationEnabled: true,
-  initialRouteName: 'UploadFile',
-  order: ['UploadFile', 'Groups', 'Chart'],
+  initialRouteName: 'Groups',
+  // order: ['UploadFile', 'Groups', 'Chart'],
   tabBarOptions
 }
 
 const appRoutes = {
-  UploadFile: { screen: UploadFile },
   Groups: { screen: Groups },
+  UploadFile: { screen: UploadFile },
+
   Chart: { screen: Chart }
 }
 

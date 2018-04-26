@@ -56,10 +56,10 @@ export default Style = {
   FONT_SIZE_TITLE: em(1.25),
   FONT_LINE_HEIGHT,
   // colors
-  COLOR_PRIMARY: '#00838f',
+  COLOR_PRIMARY: '#2196f3',
   COLOR_ERROR: '#ef0b3c',
   COLOR_FONT: '#333333',
   COLOR_WHITE: '#FFFFFF',
   COLOR_GREY: '#ccc',
-  COLOR_SUCCESS: '#00c853'
+  COLOR_SUCCESS: '#f7fcff'
 }

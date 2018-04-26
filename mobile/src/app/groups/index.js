@@ -1,3 +1,3 @@
-import Groups from './Groups'
+import Groups from './GroupsContainer'
 
 export default Groups
