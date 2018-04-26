@@ -21,8 +21,7 @@ class AbstractUUIDPk(models.Model):
 
 class AbstractBaseModel(AbstractCreateUpdate, AbstractUUIDPk):
     """
-    Base solastis abstract model, that include `created_at`, `updated_at`, `is_deleted` fields.
-    And use `uuid` as primary field.
+    Base abstract model, that include `created_at`, `updated_at` fields and use `uuid` as primary field.
     """
     class Meta:
         abstract = True

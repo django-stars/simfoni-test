@@ -14,7 +14,7 @@ class ImportFileMimeTypeValidator:
 
     def __call__(self, value):
         mime_type = getattr(value, 'content_type', '')
-        if mime_type not in self.allowed_mime_types:
+        if mime_type.lower() not in self.allowed_mime_types:
             if not mime_type:
                 mime_type = 'unknown'
             raise serializers.ValidationError(self.message.format(mime_type=mime_type))
