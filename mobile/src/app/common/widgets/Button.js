@@ -18,7 +18,7 @@ export default function Button ({ onPress, title, children, buttonStyle, textSty
 
 const style = StyleSheet.create({
   button: {
-    padding: styles.FONT_SIZE,
+    paddingHorizontal: styles.FONT_SIZE,
     alignSelf: 'stretch',
     alignItems: 'center',
     justifyContent: 'center',

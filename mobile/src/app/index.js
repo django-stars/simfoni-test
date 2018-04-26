@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { TranslateProvider } from 'gettext'
 import { Provider } from 'react-redux'
 import { StatusBar, TextInput, Keyboard, Platform } from 'react-native'
 import App from './rootNavigator'
@@ -14,7 +13,6 @@ export default class StoryToldApp extends Component {
 
   componentDidMount () {
     Keyboard.addListener('keyboardDidHide', this.blurInputs)
-    StatusBar.setBarStyle('light-content')
     if (Platform.OS !== 'ios') {
       StatusBar.setTranslucent(true)
       StatusBar.setBackgroundColor('rgba(0,0,0,0.2)')
@@ -24,9 +22,7 @@ export default class StoryToldApp extends Component {
   render () {
     return (
       <Provider store={store}>
-        <TranslateProvider>
-          <App />
-        </TranslateProvider>
+        <App />
       </Provider>
     )
   }

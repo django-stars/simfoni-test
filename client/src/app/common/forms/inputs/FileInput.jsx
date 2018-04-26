@@ -10,7 +10,8 @@ export default class FileInput extends PureComponent {
     }
   }
   @autobind
-  handleUpload(files) {
+  handleUpload(_, __, event ) {
+    const files = event.nativeEvent.target.files
     this.setState({
       fileName: files[0].name
     });

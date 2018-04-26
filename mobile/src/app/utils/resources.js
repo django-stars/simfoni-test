@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { compose, bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { startSubmit, stopSubmit, setSubmitSucceeded, setSubmitFailed } from 'redux-form'
+import { combineEpics } from 'redux-observable'
 
 import { fromPromise } from 'rxjs/observable/fromPromise'
 import { concat } from 'rxjs/observable/concat'
@@ -13,23 +13,38 @@ import 'rxjs/add/operator/switchMap'
 import 'rxjs/add/operator/mergeMap'
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/operator/filter'
-import 'rxjs/add/operator/takeUntil'
 
 import pathToRegexp from 'path-to-regexp'
 
-import omit from 'lodash/omit'
-import pick from 'lodash/pick'
-import isEmpty from 'lodash/isEmpty'
 import merge from 'lodash/merge'
 import values from 'lodash/values'
-import get from 'lodash/get'
-import has from 'lodash/has'
+import isEmpty from 'lodash/isEmpty'
 
-const REQUEST = '@ds-resource/request'
-const SET_DATA = '@ds-resource/set-data'
-const SET_ERRORS = '@ds-resource/set-errors'
-const SET_LOADING = '@ds-resource/set-loading'
-const SET_FILTERS = '@ds-resource/set-filters'
+// TODO
+// + OPTIONS request
+// + errors handling
+// +/- metadata handling (loading, global loading, etc)
+// global configuration
+// submit only dirty
+// caching (OPTIONS at least, also some resources can be cachable)
+// + list
+// + use uuid
+// + endpoint generation (/name/:uuid, /name-:placeholder/)
+// pagination, filters, withRouter
+// debounce
+// List and Item components
+// HEAD request
+// custom: actions, reducer, epics
+// allowed methods
+
+export const REQUEST = '@ds-resource/request'
+export const REQUEST_SUCCESS = '@ds-resource/request-success'
+export const REQUEST_ERROR = '@ds-resource/request-error'
+export const FILTER = '@ds-resource/filter'
+export const SET_DATA = '@ds-resource/set-data'
+export const SET_ERRORS = '@ds-resource/set-errors'
+export const SET_LOADING = '@ds-resource/set-loading'
+export const SET_FILTERS = '@ds-resource/set-filters'
 
 export function request (payload, meta) {
   return {
@@ -39,17 +54,25 @@ export function request (payload, meta) {
   }
 }
 
-export function setData (payload, meta) {
+export function requestSuccess (payload, meta) {
   return {
-    type: SET_DATA,
+    type: REQUEST_SUCCESS,
     meta,
     payload
   }
 }
 
-export function setFilters (payload, meta) {
+export function requestError (payload, meta) {
   return {
-    type: SET_FILTERS,
+    type: REQUEST_ERROR,
+    meta,
+    payload
+  }
+}
+
+export function setData (payload, meta) {
+  return {
+    type: SET_DATA,
     meta,
     payload
   }
@@ -71,122 +94,259 @@ export function setLoading (payload, meta) {
   }
 }
 
-function getNameSpaceFromResource (resource) {
-  if (typeof resource === 'string') return resource
-  return resource.namespace
-}
-
-function getDefaultState (resource) {
-  if (has(resource, 'defaultState')) {
-    return resource.defaultState
-  }
-  let defaultState = {
-    isLoading: false,
-    data: {}
-  }
-  if (has(resource, 'queries')) {
-    defaultState = {...defaultState, data: {}, filters: {}}
-  }
-  return defaultState
-}
-
-function mapStateToProps (resources) {
-  return function (state, props) {
-    if (!Array.isArray(resources)) {
-      resources = [resources]
-    }
-    return resources.reduce((res, resource) => {
-      const key = getNameSpaceFromResource(resource)
-      return {
-        ...res,
-        [key]: {...get(state.resources, key, getDefaultState(resource)), ...get(props, key, {})}
-      }
-    }, {})
-    return data
-  }
-}
-
-function getMetaFromResource (resource, options = {}) {
-  if (typeof resource === 'string') {
-    return { endPoint: resource, namespace: resource, ...options }
-  }
+export function setFilters (payload, meta) {
   return {
-    ...resource,
-    ...options,
-    endPoint: resource.endPoint || resource.namespace,
-    namespace: resource.namespace
+    type: SET_FILTERS,
+    meta,
+    payload
   }
 }
 
-function makeResourceActions (resource, options = {}) {
-  let meta = getMetaFromResource(resource, options)
-  let actions = {
-    create: makeRequestAction('POST', meta),
-    fetch: makeRequestAction('GET', meta),
-    update: makeRequestAction('PATCH', meta),
-    remove: makeRequestAction('DELETE', meta),
-    replace: makeRequestAction('PUT', meta),
-    setData: (payload, actionmeta = {}) => setData(payload, { ...meta, ...actionmeta })
+export function filter (payload, meta) {
+  return {
+    type: FILTER,
+    meta,
+    payload
   }
-  if (get(resource, 'form')) {
-    actions.onSubmit = makeRequestAction('submitForm', meta)
-  }
-  if (has(resource, 'queries')) {
-    actions.setFilters = payload => setFilters(payload, meta)
-  }
-  return actions
 }
 
-function mapDispatchToProps (resources, dispatch, options) {
-  if (!Array.isArray(resources)) {
-    resources = [resources]
-  }
-  const actions = resources.reduce((res, resource) => {
-    const key = getNameSpaceFromResource(resource)
-    const { onSubmit, ...actions } = makeResourceActions(resource, options)
-    return {
-      ...res,
-      [key]: bindActionCreators(actions, dispatch),
-      onSubmit: res.onSubmit || bindActionCreators({ onSubmit }, dispatch).onSubmit
+export function selectResource (resource) {
+  return function (state) {
+    let resourceState = {
+      // FIXME wrong place for default state
+      data: null,
+      options: null,
+      isLoading: false,
+      errors: null,
+      loading: 0,
+      filters: { ...resource.filters },
+      ...state.resource[resource.namespace]
     }
-  }, {})
-  return actions
+
+    return resourceState
+  }
 }
 
-export default function connectResouces (resource, options = {}) {
+// configuration:
+// 1. GLOBAL
+// 2. RESOURCE
+// 3. CONNECT PHASE
+
+export function connectResource (resource, options = {}) {
+  // assert(resource, 'no resource set') // TODO
+
+  resource = {
+    // TODO global configuration
+    // defaults
+    idKey: 'uuid',
+    prefetch: true,
+    refresh: false,
+    form: false,
+    list: false,
+    options: false,
+    async: false,
+    // pagination: Boolean(resource.list), // TODO is pagination enabled ?
+    item: Boolean(options.form), // disallow binding list to form
+
+    ...resource, // FIXME omit `item` here
+    ...options
+  }
+
+  resource.namespace = getNamespace(resource)
+
+  const connectHOC = connect(
+    // data
+    selectResource(resource),
+    // actions
+    (dispatch, props) => {
+      const meta = { resource, props }
+
+      const promiseableActions = {
+        create: makePromisableRequestAction('POST', meta, dispatch),
+        fetch: makePromisableRequestAction('GET', meta, dispatch),
+        update: makePromisableRequestAction('PATCH', meta, dispatch),
+        remove: makePromisableRequestAction('DELETE', meta, dispatch),
+        replace: makePromisableRequestAction('PUT', meta, dispatch),
+        fetchOptions: makePromisableRequestAction('OPTIONS', meta, dispatch),
+        filter: makePromisableAction(
+          (payload, reset = false) => filter(payload, { ...meta, reset }),
+          dispatch
+        )
+      }
+
+      const restActions = {
+        setData: payload => setData(payload, meta),
+        setErrors: payload => setErrors(payload, meta),
+        setFilters: payload => setFilters(payload, meta)
+      }
+
+      const actions = {
+        ...promiseableActions,
+        ...bindActionCreators(restActions, dispatch),
+        // aliases // TODO
+        save: promiseableActions.update
+      }
+
+      return actions
+    },
+
+    // merge
+    (stateProps, dispatchProps, ownProps) => {
+      let props = ({
+        ...ownProps,
+        [resource.namespace]: {
+          ...stateProps,
+          ...dispatchProps
+        }
+      })
+
+      if (resource.form) {
+        const isNew = !(
+          // is list resource and ID presents
+          (resource.list && ownProps[resource.idKey]) ||
+          // not list ( single enpoint resource ) and we are doing prefetch (so the resource exists)
+          (!resource.list && resource.prefetch)
+        )
+        props = {
+          ...props,
+          initialValues: stateProps.data,
+          onSubmit: isNew ? dispatchProps.create : dispatchProps.update
+        }
+      }
+
+      return props
+    }
+  )
+
+  if (!resource.prefetch) {
+    return connectHOC
+  }
+
   return compose(
-    connect(null, (dispatch, props) => mapDispatchToProps(resource, dispatch, options)),
-    connect(mapStateToProps(resource))
+    connectHOC,
+    makePrefetchHOC(resource)
   )
 }
 
-export function reducer (state = {}, { type, payload = {}, meta = {} }) {
+export function connectFormResource (resource, options) {
+  if (!options.form) {
+    // TODO assert
+    throw new Error('no form name. you must specify form name for connectFormResource')
+  }
+  return connectResource(resource, { ...options })
+}
+
+export function connectListResource (resource, options) {
+  return connectResource(resource, { ...options, list: true })
+}
+
+export function connectSingleResource (resource, options) {
+  return connectResource(resource, options)
+}
+
+function makePrefetchHOC (resource) {
+  return function (ComposedComponent) {
+    return class PrefetchResourceContainer extends Component {
+      componentDidMount () {
+        const hasData = this.props[resource.namespace].data !== null
+        const hasOptions = this.props[resource.namespace].options !== null
+        const hasId = Boolean(this.props[resource.idKey])
+
+        if ((!hasData || resource.refresh) && (!resource.list || !resource.item || hasId)) {
+          if (resource.useRouter) {
+            this.props[resource.namespace].setFilters({
+              ...resource.filters, // default filters
+              ...parseQueryParams(location.search)
+            })
+          }
+          // fetch item
+          this.props[resource.namespace].fetch()
+        } else if (!hasData) {
+          // register item
+          this.props[resource.namespace].setData({})
+        }
+
+        if (resource.options && !hasOptions) {
+          this.props[resource.namespace].fetchOptions()
+        }
+      }
+
+      render () {
+        const hasData = this.props[resource.namespace].data !== null
+        const hasOptions = this.props[resource.namespace].options !== null
+
+        if (!resource.async && (!hasData || (resource.options && !hasOptions))) {
+          return null // TODO loading
+        }
+
+        return <ComposedComponent {...this.props} />
+      }
+    }
+  }
+}
+
+const defaultState = {
+  isFetched: false
+}
+
+export function reducer (state = defaultState, { type, payload = {}, meta = {}, error = false }) {
   switch (type) {
     case SET_ERRORS:
     case SET_DATA: {
-      const currentData = state[meta.namespace]
+      const currentData = state[meta.resource.namespace]
       const dataKey = {
-        [SET_DATA]: 'data',
-        [SET_ERRORS]: 'errors',
-        [SET_FILTERS]: 'filters'
+        [SET_DATA]: meta.type === 'OPTIONS' ? 'options' : 'data',
+        [SET_ERRORS]: 'errors'
       }[type]
+
+      if (dataKey === 'options') {
+        payload = parseOptions(payload)
+      }
+
+      let count
+      if (dataKey === 'data' && meta.resource.list) {
+        count = payload.results ? payload.count : payload.length
+        payload = payload.results || payload
+      }
 
       return {
         ...state,
-        [meta.namespace]: {
+        [meta.resource.namespace]: {
           ...currentData,
+          count,
           [dataKey]: payload
         }
       }
     }
 
     case SET_LOADING: {
-      const currentData = state[meta.namespace]
+      const currentData = state[meta.resource.namespace] || { loading: 0 }
+      const loading = currentData.loading + payload
+
+      if (loading < 0) {
+        console.warn('loading counter actions are inconsistent')
+      }
+
       return {
         ...state,
-        [meta.namespace]: {
+        [meta.resource.namespace]: {
           ...currentData,
-          isLoading: payload
+          isLoading: loading > 0,
+          loading
+        }
+      }
+    }
+
+    case SET_FILTERS: {
+      const currentData = state[meta.resource.namespace] || {}
+      // FIXME we need INIT action
+      const filters = meta.reset ? meta.resource.filters : selectResource(meta.resource)({ resource: state }).filters
+
+      return {
+        ...state,
+        [meta.resource.namespace]: {
+          ...currentData,
+          filters: { ...filters, ...payload }
         }
       }
     }
@@ -195,52 +355,175 @@ export function reducer (state = {}, { type, payload = {}, meta = {} }) {
   return state
 }
 
-function getFormRequestType (form = {}, data) {
-  const { formAction, switchActionByKey } = form
-  if (!switchActionByKey) {
-    return formAction || 'POST'
-  }
-  return get(data, switchActionByKey) ? get(formAction, 'update', 'PUT') : get(formAction, 'create', 'POST')
-}
-
-export function epic (action$, store, { API }) { // FIXME API
+function requestEpic (action$, store, { API }) { // FIXME API
   return action$.ofType(REQUEST)
     // .debounce(() => interval(100)) // FIXME: FAIL on different requests types
     .mergeMap(function ({ meta, payload }) {
-      let { type, endpoint, form, namespace, queries = [], afterActions = [], useGlobalErrors, isList } = meta
-      if (endpoint.search(/\/:/) > -1) {
-        endpoint = pathToRegexp.compile(resource.endpoint)(payload)
+      const { type, props, resource } = meta
+
+      const isListItem = !resource.item && resource.list && ['PATCH', 'PUT', 'DELETE'].includes(type)
+      let itemId = (isListItem ? payload : props)[resource.idKey]
+
+      let endpoint = resource.endpoint
+      if (!(new RegExp(`(:${resource.idKey})\\W`, 'g').test(endpoint))) {
+        // automatically set '/:id?' to endpoint
+        endpoint += `/:${resource.idKey}?`
       }
-      const isFormAction = type === 'submitForm'
-      if (isFormAction) {
-        type = getFormRequestType(form, get(store.getState(), `resources.${namespace}.data`))
-      }
+      const toPath = pathToRegexp.compile(endpoint)
+      endpoint = toPath({ ...props, [resource.idKey]: itemId })
+      const submitting = resource.form && ['POST', 'PATCH', 'PUT', 'DELETE'].includes(type)
+
+      // FIXME need to find another way to get current filters
+      const hasId = Boolean(props[resource.idKey])
+      const query = resource.list && !hasId && !isListItem
+        ? selectResource(resource)(store.getState()).filters
+        : undefined
       return concat(
         of(
-          setLoading(true, meta),
-          isFormAction && startSubmit(form.name),
-          !isEmpty(queries) && setFilters(pick(payload, queries), meta)
+          setLoading(+1, meta)
         ),
-        fromPromise(API(endpoint).request(type, pick(payload, queries), omit(payload, queries)))
+        fromPromise(API(endpoint).request(type, query, payload))
           .switchMap(response => of(
-            (isList && type !== 'GET') ? request(undefined, {...meta, type: 'GET'}) : setData(response, meta),
-            setLoading(false, meta),
-            ...afterActions,
-            !!form && stopSubmit(form.name),
-            !!form && setSubmitSucceeded(form.name)
+            // TODO update list after create new item (GET after POST)
+            resource.requestPromise ? requestSuccess(response, meta) : isListItem
+              ? request(undefined, { ...meta, type: 'GET' })
+              : setData(response, meta),
+            setLoading(-1, meta),
+            submitting && meta.resource.navigateAfterSubmit
           ))
           .catch(err => of(
             setErrors(err.errors || err, meta),
-            setLoading(false, meta),
-            !!form && stopSubmit(form.name, err.errors || err),
-            !!form && setSubmitFailed(form.name) // TODO fields list
+            setLoading(-1, meta),
+            requestError(err.errors || err, meta)
           ))
       ).filter(Boolean)
     })
 }
 
-function makeRequestAction (type, meta) {
-  return function (payload, actionmeta = {}) {
-    return request(payload, { ...meta, type, ...actionmeta })
+function filterEpic (action$, store) {
+  return action$.ofType(FILTER)
+    .mergeMap(function ({ meta, payload }) {
+      return (
+        of(
+          setFilters(payload, meta),
+          request(undefined, { ...meta, type: 'GET' })
+        )
+      )
+    })
+}
+
+function promiseResolveEpic (action$, store) {
+  return action$.ofType(REQUEST_ERROR, REQUEST_SUCCESS)
+    .mergeMap(function ({ meta, payload, type }) {
+      if (meta.requestPromise) {
+        const callback = type === REQUEST_SUCCESS ? 'resolve' : 'reject'
+        meta.requestPromise[callback](payload)
+      }
+      return of({type: '@@NONE'})
+    })
+}
+
+function getNamespace ({ list, item, namespace }) {
+  if (!Array.isArray(namespace)) {
+    namespace = [namespace, namespace]
   }
+
+  return namespace[list && !item ? 0 : 1]
+}
+
+function makeRequestAction (type, meta) {
+  return function (payload, options) {
+    if (type === 'GET' && payload !== undefined) {
+      // TODO assert here
+      console.warn('GET action should not contain request body')
+    }
+    const passMeta = options === undefined
+      ? meta
+      : { ...meta, resource: { ...meta.resource, ...options }}
+    return request(payload, { ...passMeta, type })
+  }
+}
+
+function makePromisableRequestAction (type, meta, dispatch) {
+  const actionCreator = makeRequestAction(type, meta)
+  return makePromisableAction(actionCreator, dispatch)
+}
+
+function makePromisableAction (actionCreator, dispatch) {
+  return function () {
+    const {type, meta, payload} = actionCreator.apply(this, arguments)
+    return new Promise((resolve, reject) => {
+      const action = {
+        type,
+        payload,
+        meta: {
+          ...meta,
+          requestPromise: {resolve, reject}
+        }
+      }
+
+      dispatch(action)
+    })
+  }
+}
+
+function parseOptions (options) {
+  return merge.apply(null, values(options.actions))
+}
+
+export const epic = combineEpics(
+  requestEpic,
+  filterEpic,
+  promiseResolveEpic
+)
+
+// NOTE we use own copy of query utils here, because of camelCase dependency
+// TODO we can use something like 'query-string' instead
+function parseQueryParams (str) {
+  if (str.length <= 2) {
+    return {} // '' || '?'
+  }
+
+  return str
+    .substr(1) // symbol '?'
+    .split('&')
+    .reduce(function (params, param) {
+      var paramSplit = param.split('=').map(function (chunk) {
+        return decodeURIComponent(chunk.replace('+', '%20'))
+      })
+      const name = paramSplit[0]
+      const value = paramSplit[1]
+      params[name] = params.hasOwnProperty(name) ? [].concat(params[name], value) : value
+      return params
+    }, {})
+}
+
+function buildQueryParams (params) {
+  if (isEmpty(params)) {
+    return ''
+  }
+
+  return Object.keys(params).reduce(function (ret, key) {
+    let value = params[key]
+
+    if (value == null || value == undefined) {
+      return ret
+    }
+
+    if (!Array.isArray(value)) {
+      value = [value]
+    }
+
+    value.forEach(function (val) {
+      if (String(val).length > 0) {
+        ret.push(
+          encodeURIComponent(key) +
+          '=' +
+          encodeURIComponent(val)
+        )
+      }
+    })
+
+    return ret
+  }, []).join('&')
 }

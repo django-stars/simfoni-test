@@ -8,17 +8,13 @@ import isPlainObject from 'lodash/isPlainObject'
 import isObject from 'lodash/isObject'
 import flatMapDeep from 'lodash/flatMapDeep'
 import get from 'lodash/get'
-// import { actions } from './store/notification'
 // TODO it seems we can move all query logic to API
 import { buildQueryParams } from './queryParams'
 // import { logout } from 'pages/session'
 
 export const API_URL = Config.API_URL + '/api/v1'
 
-var store
-
 // FIXME make it as middleware
-export function configure (s) { store = s }
 
 export default function (endpoint) {
   return new API(endpoint)
@@ -34,7 +30,7 @@ function deepValues (obj) {
 
 function hasFile (obj) {
   // check if `obj` has at least one `File` instance
-  return deepValues(obj).some((v) => v instanceof File)
+  return !!obj.uri
 }
 
 class API {
@@ -45,51 +41,15 @@ class API {
     this.endpoint = endpoint
   }
 
-  getAuthorizationHeader () {
-    let authToken = get(store.getState(), 'resource.session.data.token')
-    return authToken ? 'JWT ' + authToken : ''
-  }
-
   prepareBody (body, isMultipartFormData) {
     if (isEmpty(body)) {
       return body
     }
 
-    if (isPlainObject(body)) {
-      // FIXME we shouldn't send file object represented by url
-      ['avatar', 'logo', 'file'].forEach(field => isString(body[field]) && delete body[field])
-    }
-
     if (isMultipartFormData) {
-      const formData = new FormData()
-
-      for (var name in body) {
-        if (isFunction(body[name])) {
-          // FIXME there should not be functions
-          console.warn('API detects invalid data value (function) in field:', name)
-          continue
-        } else if (Array.isArray(body[name])) {
-          body[name].forEach((value, i) => {
-            if (isObject(value)) {
-              keys(value).forEach(key => {
-                formData.append(`${name}[${i}]${key}`, value[key])
-              })
-            } else {
-              formData.append(name, value)
-            }
-          })
-        } else if (isPlainObject(body[name])) {
-          keys(body[name]).forEach(key => {
-            formData.append(`${name}.${key}`, body[name][key])
-          })
-        } else {
-          if (body[name] !== null) {
-            // FIXME this shouldn't be here. check form body serialization
-            // https://github.com/erikras/redux-form/issues/701
-            formData.append(name, body[name])
-          }
-        }
-      }
+      var formData = new FormData()
+      let file = body
+      formData.append('file', file)
       return formData
     } else {
       return JSON.stringify(body)
@@ -99,7 +59,6 @@ class API {
   handleResponseCallback (response) {
     if (response.status === 401) {
       // 401 (Unauthorized)
-      // store.dispatch(logout())
       return
     } else if (response.status === 204) {
       // 204 (No Content)
@@ -122,7 +81,6 @@ class API {
           let eKey = key
           if (key === 'non_field_errors' || key === 'nonFieldErrors' || key === 'detail') {
             eKey = '_error'
-            // store.dispatch(actions.show({ message: body[key], error: true }))
           }
           if (Array.isArray(body[key])) {
             errors[eKey] = body[key][0]
@@ -137,20 +95,25 @@ class API {
   request (method, params = {}, body = {}) {
     const queryParams = isEmpty(params) ? '' : '?' + buildQueryParams(params)
     const resource = `${API_URL}/${this.endpoint}/${queryParams}`
-    const headers = new Headers({
-      'Authorization': this.getAuthorizationHeader(),
+    let headers = {
       'Content-Type': 'application/json'
-    })
-
+    }
     const isMultipartFormData = hasFile(body)
-    isMultipartFormData && headers.delete('Content-Type')
+    if (isMultipartFormData) {
+      headers = {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
 
     body = this.prepareBody(body, isMultipartFormData)
+    if (method === 'GET') body = undefined
     const options = {
       method,
       headers,
       body
     }
+
+    console.log({resource, options})
     return fetch(resource, options).then(this.handleResponseCallback)
   }
 
