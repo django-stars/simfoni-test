@@ -6,8 +6,9 @@ Once you upload a data - it will be stored into db. But the next upload will era
 Meanwhile the grouping settings are kept the same.
 
 Revenue import validation:
-- file should excel compatible format;
-- the first line is a header - 'customer names', 'revenue' - in such order, case insensitive;
+- file should be excel compatible format;
+- the first line is a header - 'customer names', 'revenue' - in such order, case insensitive. Other columns after header length are ignored;
+- we read until first empty row as in some files there is more than 1 million empty rows;
 - first column is treated as string with 255 max char length;
 - second column is treated as decimal (min 0, max 999999999999.99);
 - file max size is 10mb;
