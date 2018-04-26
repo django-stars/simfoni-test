@@ -1,6 +1,10 @@
+from copy import deepcopy
+
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from django.db.models import Max, Min
 
 from data_importer.api.serializers import ImportSerializer
 from data_importer.importer_template import ImporterTemplate
@@ -27,8 +31,9 @@ class RevenueGroupRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPI
 
 class RevenueRetrieveUploadAPIView(APIView):
     IMPORTER_TEMPLATE = ImporterTemplate(
-        ('customer names', 'revenue'),
-        RevenueImportSerializer
+        fields=('customer names', 'revenue'),
+        serializer=RevenueImportSerializer,
+        borders_model_field='revenue'
     )
 
     def get(self, request, *args, **kwargs):
@@ -45,9 +50,19 @@ class RevenueRetrieveUploadAPIView(APIView):
         serializer = ImportSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             # we decided to do such workflow - on each file upload we clear previous data
-            self.IMPORTER_TEMPLATE.serializer.Meta.model.objects.all().delete()
+            model = self.IMPORTER_TEMPLATE.serializer.Meta.model
+            model.objects.all().delete()
+
             importer = OpenpyxlDataImporter(serializer.validated_data['file'], self.IMPORTER_TEMPLATE)
             if importer.is_valid(raise_exception=True):
                 importer.parse()  # saves rows to db
-                return Response(importer.report, status=status.HTTP_200_OK)
 
+                # make response more useful for customers
+                report = deepcopy(importer.report)
+                report.update(
+                    Revenue.objects.aggregate(
+                        min=Min(self.IMPORTER_TEMPLATE.borders_model_field),
+                        max=Max(self.IMPORTER_TEMPLATE.borders_model_field)
+                    )
+                )
+                return Response(report, status=status.HTTP_200_OK)
