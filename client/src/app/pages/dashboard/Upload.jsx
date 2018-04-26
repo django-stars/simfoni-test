@@ -4,7 +4,7 @@ import isEmpty from 'lodash/isEmpty'
 import get from 'lodash/get'
 
 export default function Upload ({ handleSubmit, upload }) {
-  const { min = 0, max = 0, skip = 0, uploaded = 0 } = get(upload, 'data', {}) || {}
+  const { min = 0, max = 0, skipped = 0, imported = 0 } = get(upload, 'data', {}) || {}
   return (
     <form className='upload-container' onSubmit={handleSubmit}>
       <FileInputField name='file' fieldLabel='Upload files' />
@@ -16,7 +16,7 @@ export default function Upload ({ handleSubmit, upload }) {
           <div className='file-details'>
             <FileInfo
               name='Records'
-              value={`${(uploaded - skip).toLocaleString('en-IN')} of ${uploaded.toLocaleString('en-IN')}`}
+              value={`${(imported - skipped).toLocaleString('en-IN')} of ${imported.toLocaleString('en-IN')}`}
             />
             <FileInfo
               name='Min'

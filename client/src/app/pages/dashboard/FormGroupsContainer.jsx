@@ -13,12 +13,13 @@ class FormGroupsContainer extends PureComponent {
   }
 
   @autobind
-  handleChange(item={}, index){
+  handleChange(item={}, index, onError){
     const action = item.uuid ? this.props.groups.update : this.props.groups.create
     action(item, { requestPromise: true })
       .then(resp=>{
         this.props.groups.setData(this.props.groups.data.map((data, _index)=> _index === index ? resp : data))
       })
+      .catch(onError)
   }
 
   @autobind

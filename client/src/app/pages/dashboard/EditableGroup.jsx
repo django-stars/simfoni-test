@@ -11,7 +11,11 @@ import get from 'lodash/get'
 export default class EditableGroup extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = isEmpty(props.item) ? { name: '' } : props.item
+    const initial = isEmpty(props.item) ? { name: '' } : props.item
+    this.state = {
+      error: false,
+      ...initial
+    }
   }
 
   onChange (name, value) {
@@ -22,7 +26,7 @@ export default class EditableGroup extends PureComponent {
   validate() {
     const { name, revenue_from, revenue_to, uuid } = this.state
     if(name && ( revenue_from || revenue_to ) && !isEqual(this.state, this.props.item)) {
-      this.props.handleChange(this.state, this.props.index)
+      this.props.handleChange(this.state, this.props.index, ()=>this.setState({ error: true }))
     }
   }
 
@@ -33,10 +37,10 @@ export default class EditableGroup extends PureComponent {
   }
 
   render () {
-    const { name, revenue_from, revenue_to } = this.state
+    const { name, revenue_from, revenue_to, error } = this.state
     const { index, deleteGroup } = this.props
     return (
-      <li className='edit-row'>
+      <li className={`edit-row ${error ? 'error' : ''}`}>
         <div>{index}</div>
         <div>
           <TextInput
