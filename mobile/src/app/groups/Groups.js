@@ -57,7 +57,7 @@ export default class Groups extends PureComponent {
 }
 
 function keyExtractor ({uuid}, index) {
-  return uuid || index
+  return uuid || index + ''
 }
 
 const style = StyleSheet.create({

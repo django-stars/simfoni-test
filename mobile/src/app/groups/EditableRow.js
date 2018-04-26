@@ -17,9 +17,9 @@ export default class EditableRow extends PureComponent {
   }
 
   validate () {
-    const { name, revenue_from, revenue_to, uuid } = this.state
+    const { name, revenue_from, revenue_to } = this.state
     if (name && (revenue_from || revenue_to) && !isEqual(this.state, this.props.item)) {
-      this.props.handleChange(this.state, this.props.index)
+      this.props.handleChange({...(this.props.item || {}), ...this.state}, this.props.index)
     }
   }
 
@@ -38,7 +38,6 @@ export default class EditableRow extends PureComponent {
           <TextInput
             onChangeText={this.onChange.bind(this, 'name')}
             value={name}
-            onBlur={this.validate}
             style={style.input}
           />
         </View>
@@ -46,7 +45,6 @@ export default class EditableRow extends PureComponent {
           <TextInput
             onChangeText={this.onChange.bind(this, 'revenue_from')}
             value={revenue_from}
-            onBlur={this.validate}
             style={style.input}
           />
         </View>
@@ -54,10 +52,12 @@ export default class EditableRow extends PureComponent {
           <TextInput
             onChangeText={this.onChange.bind(this, 'revenue_to')}
             value={revenue_to}
-            onBlur={this.validate}
             style={style.input}
           />
         </View>
+        <Button buttonStyle={style.button} onPress={this.validate}>
+          <Text style={style.buttonText}>+</Text>
+        </Button>
         <Button buttonStyle={style.button} onPress={this.deleteGroup}>
           <Text style={style.buttonText}>-</Text>
         </Button>
