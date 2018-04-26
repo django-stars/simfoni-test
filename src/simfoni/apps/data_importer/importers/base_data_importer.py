@@ -27,8 +27,10 @@ class BaseDataImporter(abc.ABC):
         template - ImporterTemplate tuple of 'fields' (list/tuple) and 'serializer' (drf serializer)
         """
         self.source_file = source_file
-        self.headers = template.fields
         self.serializer = template.serializer
+        self.headers = template.fields
+        # sometimes empty cells are treated as cells with values. So we need to trim them.
+        self.slice_index = len(self.headers)
 
         self.rows_imported = 0
         self.rows_skipped = 0
@@ -47,7 +49,7 @@ class BaseDataImporter(abc.ABC):
         """
         if not self._is_valid:
             self._iterator = self._get_rows_iterator()
-            header_row = next(self._iterator)
+            header_row = next(self._iterator)[:self.slice_index]  # remove useless cells
             try:
                 assert len(header_row) == len(self.headers)
                 for cell, field_name in zip(header_row, self.headers):
@@ -72,8 +74,15 @@ class BaseDataImporter(abc.ABC):
             assert self._is_valid, 'File structure doesn\'t correspond provided serializer. Check file content.'
             for row in self._iterator:
                 mapped_row = {
-                    serializer_field: row.value for serializer_field, row in zip(self.serializer.Meta.fields, row)
+                    serializer_field: row.value for serializer_field, row in zip(
+                        self.serializer.Meta.fields, row[:self.slice_index]
+                    )
                 }
+
+                # some editors saves more than 1 million empty rows. So we stop parsing when find first empty row
+                if not all(mapped_row.values()):
+                    break
+
                 row_serializer = self.serializer(data=mapped_row)
                 if row_serializer.is_valid():
                     self.rows_imported += 1
