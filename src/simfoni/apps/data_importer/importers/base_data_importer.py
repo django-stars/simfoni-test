@@ -45,13 +45,12 @@ class BaseDataImporter(abc.ABC):
         """
         Check file content:
         - We assume that file has a header in the first row;
-        - Also we check that columns amount corresponds amount of serializer fields.
+        - Also we check that column names corresponds expected headers (self.headers).
         """
         if not self._is_valid:
             self._iterator = self._get_rows_iterator()
             header_row = next(self._iterator)[:self.slice_index]  # remove useless cells
             try:
-                assert len(header_row) == len(self.headers)
                 for cell, field_name in zip(header_row, self.headers):
                     assert cell.value.lower().strip() == field_name.lower()
             except AssertionError:
