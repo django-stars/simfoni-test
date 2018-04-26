@@ -24,10 +24,13 @@ class RevenueGroupSerializer(serializers.ModelSerializer):
     def validate(self, data):
         # when data is not uploaded, the CreateOnlyDefault will return None.
         # In this case we need to trigger required error for field
+        required_errors = {}
         if data['revenue_from'] is None:
-            raise serializers.ValidationError({'revenue_from': [self.fields['revenue_from'].error_messages['required']]})
+            required_errors.update({'revenue_from': [self.fields['revenue_from'].error_messages['required']]})
         if data['revenue_to'] is None:
-            raise serializers.ValidationError({'revenue_to': [self.fields['revenue_to'].error_messages['required']]})
+            required_errors.update({'revenue_to': [self.fields['revenue_to'].error_messages['required']]})
+        if required_errors:
+            raise serializers.ValidationError(required_errors)
 
         if data['revenue_from'] >= data['revenue_to']:
             raise serializers.ValidationError(_("Invalid range"))
