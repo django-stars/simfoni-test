@@ -49,10 +49,15 @@ class BaseDataImporter(abc.ABC):
         """
         if not self._is_valid:
             self._iterator = self._get_rows_iterator()
-            header_row = next(self._iterator)[:self.slice_index]  # remove useless cells
+            header_row = next(self._iterator)
             try:
+                # We need to remove unused trailing cells.
+                # But first we need ensure that we have all not less then expect
+                assert len(header_row) >= self.slice_index
+                header_row = header_row[:self.slice_index]
+                # check headers naming
                 for cell, field_name in zip(header_row, self.headers):
-                    assert cell.value.lower().strip() == field_name.lower()
+                    assert str(cell.value).lower().strip() == field_name.lower()
             except AssertionError:
                 if raise_exception:
                     raise serializers.ValidationError(self.WRONG_FILE_CONTENT_MESSAGE)
