@@ -25,9 +25,7 @@ export default class EditableGroup extends PureComponent {
   @autobind
   validate() {
     const { name, revenue_from, revenue_to, uuid } = this.state
-    if(name && ( revenue_from || revenue_to ) && !isEqual(this.state, this.props.item)) {
-      this.props.handleChange({...this.props.item, ...this.state}, this.props.index, ()=>this.setState({ error: true }))
-    }
+    this.props.handleChange(this.state, this.props.index, ()=>this.setState({ error: true }))
   }
 
   @autobind
@@ -51,7 +49,6 @@ export default class EditableGroup extends PureComponent {
           <TextInput
             onChange={this.onChange.bind(this, 'name')}
             value={name}
-            onBlur={this.validate}
             onFocus={this.clearErrors}
           />
         </div>
@@ -59,7 +56,6 @@ export default class EditableGroup extends PureComponent {
           <CurrencyInput
             onChange={this.onChange.bind(this, 'revenue_from')}
             value={revenue_from}
-            onBlur={this.validate}
             onFocus={this.clearErrors}
           />
         </div>
@@ -67,10 +63,10 @@ export default class EditableGroup extends PureComponent {
           <CurrencyInput
             onChange={this.onChange.bind(this, 'revenue_to')}
             value={revenue_to}
-            onBlur={this.validate}
             onFocus={this.clearErrors}
           />
         </div>
+        <Button color='primary' onClick={this.validate}>+</Button>
         <Button color='primary' onClick={this.deleteGroup}>-</Button>
       </li>
     )
