@@ -7,7 +7,7 @@ from data_importer.importer_template import ImporterTemplate
 from data_importer.importers.openpyxl_importer import OpenpyxlDataImporter
 from revenue.api.serializers.revenue_group import RevenueGroupSerializer
 from revenue.api.serializers.revenue_serializer import RevenueImportSerializer
-from revenue.models import RevenueGroup
+from revenue.models import RevenueGroup, Revenue
 
 
 # APIViews were used instead of ViewSets because it's more verbose/explicit.
@@ -35,17 +35,11 @@ class RevenueRetrieveUploadAPIView(APIView):
         groups = RevenueGroup.objects.all()
         data = []
         for group in groups:
-            data = {
+            data.append({
                 'name': group.name,
-                'value': 33
-            }
-        # show not displayed?
-        return Response(
-            data,
-            status=status.HTTP_200_OK
-        )
-
-    # def post(self, request):
+                'value': Revenue.objects.filter(revenue__gte=group.revenue_from, revenue__lte=group.revenue_to).count()
+            })
+        return Response(data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = ImportSerializer(data=request.data)
@@ -57,4 +51,3 @@ class RevenueRetrieveUploadAPIView(APIView):
                 importer.parse()  # saves rows to db
                 return Response(importer.report, status=status.HTTP_200_OK)
 
-# TODO: Describe everything in READMEEEEE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
