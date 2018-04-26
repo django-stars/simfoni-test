@@ -27,13 +27,14 @@ export default class CurrencyInput extends Component {
   }
   render() {
     const { inputClassName, placeholder, required,
-      disabled, name, value, onBlur } = this.props
+      disabled, name, value, onBlur, onFocus } = this.props
     return (
       <NumberFormat
         className={inputClassName}
         placeholder={placeholder}
         onValueChange={this.handleChange}
         onBlur={onBlur}
+        onFocus={onFocus}
         required={required}
         disabled={disabled}
         name={name}

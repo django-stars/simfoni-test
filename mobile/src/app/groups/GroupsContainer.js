@@ -60,7 +60,7 @@ const FormGroupsContainerConnected = compose(
 )(FormGroupsContainer)
 
 FormGroupsContainerConnected.navigationOptions = {
-  tabBarIcon: TabBarIcon('earnings')
+  tabBarIcon: TabBarIcon('groups')
 }
 
 export default FormGroupsContainerConnected
