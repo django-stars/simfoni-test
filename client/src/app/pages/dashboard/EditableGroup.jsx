@@ -26,7 +26,7 @@ export default class EditableGroup extends PureComponent {
   validate() {
     const { name, revenue_from, revenue_to, uuid } = this.state
     if(name && ( revenue_from || revenue_to ) && !isEqual(this.state, this.props.item)) {
-      this.props.handleChange(this.state, this.props.index, ()=>this.setState({ error: true }))
+      this.props.handleChange({...this.props.item, ...this.state}, this.props.index, ()=>this.setState({ error: true }))
     }
   }
 
