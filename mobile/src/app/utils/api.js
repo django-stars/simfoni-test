@@ -8,17 +8,13 @@ import isPlainObject from 'lodash/isPlainObject'
 import isObject from 'lodash/isObject'
 import flatMapDeep from 'lodash/flatMapDeep'
 import get from 'lodash/get'
-// import { actions } from './store/notification'
 // TODO it seems we can move all query logic to API
 import { buildQueryParams } from './queryParams'
 // import { logout } from 'pages/session'
 
 export const API_URL = Config.API_URL + '/api/v1'
 
-var store
-
 // FIXME make it as middleware
-export function configure (s) { store = s }
 
 export default function (endpoint) {
   return new API(endpoint)
@@ -43,11 +39,6 @@ class API {
       console.error('invalid API endpoint: \'%s\'. API endpoint should not contain trailing slashes and query params', endpoint)
     }
     this.endpoint = endpoint
-  }
-
-  getAuthorizationHeader () {
-    let authToken = get(store.getState(), 'resource.session.data.token')
-    return authToken ? 'JWT ' + authToken : ''
   }
 
   prepareBody (body, isMultipartFormData) {
@@ -99,7 +90,6 @@ class API {
   handleResponseCallback (response) {
     if (response.status === 401) {
       // 401 (Unauthorized)
-      // store.dispatch(logout())
       return
     } else if (response.status === 204) {
       // 204 (No Content)
@@ -122,7 +112,6 @@ class API {
           let eKey = key
           if (key === 'non_field_errors' || key === 'nonFieldErrors' || key === 'detail') {
             eKey = '_error'
-            // store.dispatch(actions.show({ message: body[key], error: true }))
           }
           if (Array.isArray(body[key])) {
             errors[eKey] = body[key][0]
@@ -137,10 +126,6 @@ class API {
   request (method, params = {}, body = {}) {
     const queryParams = isEmpty(params) ? '' : '?' + buildQueryParams(params)
     const resource = `${API_URL}/${this.endpoint}/${queryParams}`
-    const headers = new Headers({
-      'Authorization': this.getAuthorizationHeader(),
-      'Content-Type': 'application/json'
-    })
 
     const isMultipartFormData = hasFile(body)
     isMultipartFormData && headers.delete('Content-Type')

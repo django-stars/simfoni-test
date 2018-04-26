@@ -1,0 +1,12 @@
+{
+  "presets": ["react-native"],
+  "plugins": [[
+    "auto-import", {
+      "declarations": [
+        { "default": "React", "members": ["Component", "PureComponent"], "path": "react" },
+        { "default": "gettext", "members": ["Translator"],  "path": "gettext" },
+        { "default": "styles",  "path": "styles" }
+      ]
+    }
+  ]]
+}

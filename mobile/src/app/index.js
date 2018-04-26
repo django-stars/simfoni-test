@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { TranslateProvider } from 'gettext'
 import { Provider } from 'react-redux'
 import { StatusBar, TextInput, Keyboard, Platform } from 'react-native'
 import App from './rootNavigator'
@@ -24,9 +23,7 @@ export default class StoryToldApp extends Component {
   render () {
     return (
       <Provider store={store}>
-        <TranslateProvider>
-          <App />
-        </TranslateProvider>
+        <App />
       </Provider>
     )
   }
