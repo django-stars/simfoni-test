@@ -21,7 +21,7 @@ export default function FormGroups ({ groups: { data = [] }, handleChange, creat
           {isEmpty(data) && <li className='empty-groups'>Please upload data</li> }
           {data.map((item, index) => (
             <EditableGroup
-              key={index}
+              key={item.uuid || index}
               item={item}
               index={index}
               handleChange={handleChange}

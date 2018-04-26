@@ -113,7 +113,6 @@ class API {
       body
     }
 
-    console.log({resource, options})
     return fetch(resource, options).then(this.handleResponseCallback)
   }
 

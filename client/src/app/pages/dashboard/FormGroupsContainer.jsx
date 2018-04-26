@@ -14,6 +14,7 @@ class FormGroupsContainer extends PureComponent {
 
   @autobind
   handleChange(item={}, index, onError){
+    console.log({item, index})
     const action = item.uuid ? this.props.groups.update : this.props.groups.create
     action(item, { requestPromise: true })
       .then(resp=>{

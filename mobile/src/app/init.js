@@ -41,8 +41,8 @@ import API from './utils/api'
 const createStoreWithMiddleware = applyMiddleware(
   createEpicMiddleware(combineEpics(...epics, resourcesEpic), { dependencies: { API } }),
   storageMiddleware,
-  navigationMiddleware,
-  createLogger()
+  navigationMiddleware
+  // createLogger()
 )(createStore)
 
 const store = createStoreWithMiddleware(appReducer)

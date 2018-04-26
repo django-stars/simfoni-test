@@ -57,7 +57,7 @@ const UploadContainerResources = connectResource({
 })(UploadContainer)
 
 UploadContainerResources.navigationOptions = {
-  tabBarIcon: TabBarIcon('earnings')
+  tabBarIcon: TabBarIcon('upload')
 }
 
 export default UploadContainerResources

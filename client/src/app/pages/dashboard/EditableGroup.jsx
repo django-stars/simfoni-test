@@ -36,17 +36,23 @@ export default class EditableGroup extends PureComponent {
     this.props.deleteGroup({ index, uuid })
   }
 
+  @autobind
+  clearErrors(){
+    this.setState({error: false})
+  }
+
   render () {
     const { name, revenue_from, revenue_to, error } = this.state
     const { index, deleteGroup } = this.props
     return (
       <li className={`edit-row ${error ? 'error' : ''}`}>
-        <div>{index}</div>
+        <div>{index+1}</div>
         <div>
           <TextInput
             onChange={this.onChange.bind(this, 'name')}
             value={name}
             onBlur={this.validate}
+            onFocus={this.clearErrors}
           />
         </div>
         <div>
@@ -54,6 +60,7 @@ export default class EditableGroup extends PureComponent {
             onChange={this.onChange.bind(this, 'revenue_from')}
             value={revenue_from}
             onBlur={this.validate}
+            onFocus={this.clearErrors}
           />
         </div>
         <div>
@@ -61,6 +68,7 @@ export default class EditableGroup extends PureComponent {
             onChange={this.onChange.bind(this, 'revenue_to')}
             value={revenue_to}
             onBlur={this.validate}
+            onFocus={this.clearErrors}
           />
         </div>
         <Button color='primary' onClick={this.deleteGroup}>-</Button>
