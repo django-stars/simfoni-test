@@ -10,7 +10,7 @@ from data_importer.api.serializers import ImportSerializer
 from data_importer.importer_template import ImporterTemplate
 from data_importer.importers.openpyxl_importer import OpenpyxlDataImporter
 from revenue.api.serializers.revenue_group import RevenueGroupSerializer
-from revenue.api.serializers.revenue_serializer import RevenueImportSerializer
+from revenue.api.serializers.revenue import RevenueImportSerializer
 from revenue.models import RevenueGroup, Revenue
 
 
