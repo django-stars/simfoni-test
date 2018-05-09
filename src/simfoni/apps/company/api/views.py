@@ -32,7 +32,8 @@ class UploadCompaniesAPIView(APIView):
 
                 report = deepcopy(importer.report)
                 # TODO: update report with normalisation data
-
+                report['normalized'] = 333
+                report['duplicate'] = 666
                 return Response(report, status=status.HTTP_200_OK)
 
 
