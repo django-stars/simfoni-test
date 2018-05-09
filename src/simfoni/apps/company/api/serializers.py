@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from company.models import RawCompany, Match
+from company.models import RawCompany, Match, Company
 
 
 class RawCompanyImportSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class RawCompanyImportSerializer(serializers.ModelSerializer):
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
-        model = RawCompany
+        model = Company
         fields = '__all__'
 
 
