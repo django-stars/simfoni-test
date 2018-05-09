@@ -55,7 +55,7 @@ class CompaniesListAPIView(generics.ListAPIView):
 class CompanyMatchesListAPIView(APIView):
     def get(self, request, pk, *args, **kwargs):
         company = get_object_or_404(Company, pk=pk)
-        return Response(MatchSerializer(company.matches.all(), many=True).data)
+        return Response(MatchSerializer(company.matches.filter(is_accepted=False), many=True).data)
 
 
 class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
