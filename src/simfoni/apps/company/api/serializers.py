@@ -33,3 +33,10 @@ class MatchSerializer(serializers.ModelSerializer):
 
     def get_raw_company(self, instance):
         return instance.raw_company.name
+
+
+class MatchAcceptSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Match
+        fields = ('uuid', 'is_accepted',)

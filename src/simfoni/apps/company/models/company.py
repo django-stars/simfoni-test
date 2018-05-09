@@ -7,3 +7,6 @@ from core.models import AbstractBaseModel
 class Company(AbstractBaseModel):
     """ Contain suppliers. Uploaded data would be cleaned and associated with this records """
     name = models.CharField(_('Company name'), max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name

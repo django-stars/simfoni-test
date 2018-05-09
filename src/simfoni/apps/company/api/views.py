@@ -5,7 +5,9 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from company.api.serializers import RawCompanyImportSerializer, CompanySerializer, MatchSerializer
+from company.api.serializers import (
+    RawCompanyImportSerializer, CompanySerializer, MatchSerializer, MatchAcceptSerializer
+)
 from company.models import Company, Match, RawCompany
 from data_importer.api.serializers import ImportSerializer
 from data_importer.importer_template import ImporterTemplate
@@ -54,3 +56,17 @@ class CompanyMatchesListAPIView(APIView):
     def get(self, request, pk, *args, **kwargs):
         company = get_object_or_404(Company, pk=pk)
         return Response(MatchSerializer(company.matches.all(), many=True).data)
+
+
+class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Match.objects.all()
+    serializer_class = MatchAcceptSerializer
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+
+        # in addition we need to drop all other matches for raw company record
+        instance = self.get_object()
+        if instance.is_accepted:
+            instance.raw_company.matches.exclude(pk=instance.uuid).delete()
+        return response
