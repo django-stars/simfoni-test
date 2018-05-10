@@ -27,12 +27,18 @@
       > div {
         background: transparent;
         padding: 0;
+        &:not(:first-of-type) > div > div > span > div {
+          justify-content: center;
+        }
         > div, > div > div, > div > div > span {
           display: block;
           height: 100%;
           width: 100%;
           font-size: 14px;
           color: $gray-200;
+          word-break: break-all;
+          white-space: normal;
+         
         }
         > div > div > span > div {
           height: 100%;
@@ -75,4 +81,16 @@
       background: $primary;
     }
   }
+}
+
+.react-grid-Empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $primary;
+  position: absolute;
+  top: 25px;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
