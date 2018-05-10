@@ -58,7 +58,11 @@ export default class SortableTable extends PureComponent {
     const { joinToName, data: _del, minHeight: _del1, headers: _dell3, ...rest  } = this.props
     const { data } = this.state
     if(joinToName) {
-      return { ...data[i], [joinToName]: { data: data[i], props: rest } }
+      return {
+        ...data[i],
+        [joinToName]: { data: data[i], props: rest } ,
+        score: data[i].score ? parseInt(data[i].score, 10) + ' %' : '',
+      }
     }
     return data[i]
   }
