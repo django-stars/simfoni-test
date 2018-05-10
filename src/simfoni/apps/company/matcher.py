@@ -129,8 +129,6 @@ def match(processed_names):
 
 
 def get_score(current_name, match_info):
-    # if current_name.lower() == 'stainless distribution':
-    #     import ipdb;ipdb.set_trace()
     if current_name == match_info.name_info.name:
         return 100
     else:
