@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from company.api.serializers import (
     RawCompanyImportSerializer, CompanySerializer, MatchSerializer, MatchAcceptSerializer
 )
+from company.matcher import match_companies
 from company.models import Company, Match, RawCompany
 from data_importer.api.serializers import ImportSerializer
 from data_importer.importer_template import ImporterTemplate
@@ -28,10 +29,7 @@ class UploadCompaniesAPIView(APIView):
             if importer.is_valid(raise_exception=True):
                 importer.parse()  # saves rows to db
 
-                #############################
-                # Roman, your time has come!#
-                #############################
-
+                match_companies(RawCompany.objects.filter(matches=None))
                 report = deepcopy(importer.report)
                 # TODO: update report with normalisation data
                 report['normalized'] = 333
@@ -69,4 +67,5 @@ class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         if instance.is_accepted:
             instance.raw_company.matches.exclude(pk=instance.uuid).delete()
+            # also there is a post_delete signal for Match object which will remove Companies without matches
         return response
