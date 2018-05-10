@@ -66,6 +66,6 @@ class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
         # in addition we need to drop all other matches for raw company record
         instance = self.get_object()
         if instance.is_accepted:
-            instance.raw_company.matches.exclude(pk=instance.uuid).delete()
+            instance.raw_company.matches.filter(company=instance).exclude(pk=instance.uuid).delete()
             # also there is a post_delete signal for Match object which will remove Companies without matches
         return response
