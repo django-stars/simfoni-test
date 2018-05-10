@@ -68,7 +68,7 @@ export default class SortableTable extends PureComponent {
   }
 
   render () {
-    const { headers } = this.props
+    const { headers, emptyRowsView } = this.props
     const { minHeight, data } = this.state
     return (
       <ReactDataGrid
@@ -80,6 +80,7 @@ export default class SortableTable extends PureComponent {
         onGridSort={this.handleSort}
         headerRowHeight={25}
         rowHeight={50}
+        emptyRowsView={emptyRowsView || null}
       />
     )
   }
