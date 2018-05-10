@@ -35,6 +35,7 @@ class BaseDataImporter(abc.ABC):
         self.rows_imported = 0
         self.rows_skipped = 0
 
+        self.objects = []
         self.is_parsed = False
         self.errors = {}
 
@@ -91,9 +92,13 @@ class BaseDataImporter(abc.ABC):
                 row_serializer = self.serializer(data=mapped_row)
                 if row_serializer.is_valid():
                     self.rows_imported += 1
-                    row_serializer.save()
+                    # for speed improvement we collect all objects and use bulk create
+                    # row_serializer.save()
+                    self.objects.append(self.serializer.Meta.model(**row_serializer.validated_data))
                 else:
                     self.rows_skipped += 1
+
+            self.serializer.Meta.model.objects.bulk_create(self.objects)
 
     @property
     def report(self):
