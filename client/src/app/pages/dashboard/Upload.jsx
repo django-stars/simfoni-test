@@ -5,11 +5,13 @@ import Loader from 'react-loader-spinner'
 import Progress from './Progress'
 import isEmpty from 'lodash/isEmpty'
 import get from 'lodash/get'
+import CustomLoader from 'common/loader/Loader'
 
 export default function Upload ({ handleSubmit, upload, pristine, submitting, onSubmit }) {
   const { min = 0, max = 0, skipped = 0, imported = 0 } = get(upload, 'data', {}) || {}
   return (
     <Col xs='1' className='sidebar'>
+      {upload.loading === 1 && <CustomLoader />}
       <form className='upload-container' onSubmit={handleSubmit(onSubmit)}>
         <FileInputField name='file' fieldLabel='Data details' />
         <div className='file-info-pannnel'>

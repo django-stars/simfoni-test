@@ -41,7 +41,14 @@ export default class Matches extends PureComponent {
     return () => this.props.currentMatch.update(companies.map(item=>({...item, is_accepted: true})), { multiple: true, endpoint: 'matches/:uuid?' })
       .then( _ => {
         this.props.companies.fetch()
-        this.props.matches.fetch()
+        this.props.matches.fetch().then(resp => {
+          if(!resp || !resp.length) {
+            this.props.navigate('root')
+          }
+        })
+        .catch(error => {
+          this.props.navigate('root')
+        })
       })
   }
 
