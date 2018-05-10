@@ -5,7 +5,7 @@ import { Link } from 'common/router'
 import { Button } from 'reactstrap'
 import { navigate } from 'common/router'
 import { connect } from 'react-redux'
-
+import CustomLoader from 'common/loader/Loader'
 class Header extends PureComponent {
   flush() {
     this.props.flush.create({}).then(_ => {
@@ -18,6 +18,7 @@ class Header extends PureComponent {
       <header>
         <Link to='dashboard' className='app_logo' />
         <Button color="success" onClick={this.flush.bind(this)}>Clear all</Button>
+        {this.props.flush.loading === 1 && <CustomLoader />}
       </header>
     )
   }
