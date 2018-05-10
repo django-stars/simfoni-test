@@ -38,7 +38,7 @@ export default class Matches extends PureComponent {
 
   @autobind
   accept(companies=[]) {
-    return () => this.props.matches.update(companies.map(item=>({...item, is_accepted: true})), { multiple: true, endpoint: 'matches/:uuid?' })
+    return () => this.props.currentMatch.update(companies.map(item=>({...item, is_accepted: true})), { multiple: true, endpoint: 'matches/:uuid?' })
       .then( _ => {
         this.props.companies.fetch()
         this.props.matches.fetch()
@@ -47,7 +47,7 @@ export default class Matches extends PureComponent {
 
   @autobind
   decline(companies=[]) {
-    return () => this.props.matches.remove(companies, { multiple: true, endpoint: 'matches/:uuid?' })
+    return () => this.props.currentMatch.remove(companies, { multiple: true, endpoint: 'matches/:uuid?' })
       .then( _ => {
         this.props.companies.fetch().then(comp => {
           if(comp.find(item=> item.uuid === this.props.match.params.uuid)) {

@@ -39,6 +39,11 @@ export default compose(
     refresh: true,
   }),
   connectResource({
+    namespace: 'currentMatch',
+    endpoint: 'companies/:uuid?/matches',
+    prefetch: false,
+  }),
+  connectResource({
     namespace: 'companies',
     endpoint: 'companies',
     prefetch: false,
