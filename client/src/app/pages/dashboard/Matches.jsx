@@ -47,10 +47,15 @@ export default class Matches extends PureComponent {
 
   @autobind
   decline(companies=[]) {
-    return () => this.props.matches.delete(companies, { multiple: true, endpoint: 'matches/:uuid?' })
+    return () => this.props.matches.remove(companies, { multiple: true, endpoint: 'matches/:uuid?' })
       .then( _ => {
-        this.props.companies.fetch()
-        this.props.matches.fetch()
+        this.props.companies.fetch().then(comp => {
+          if(comp.find(item=> item.uuid === this.props.match.params.uuid)) {
+            this.props.matches.fetch()
+          } else {
+            this.props.navigate('root')
+          }
+        })
       })
   }
 

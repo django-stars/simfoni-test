@@ -6,6 +6,7 @@ import { connectResource } from 'common/utils/resource'
 import Matches from './Matches'
 import get from 'lodash/get'
 import isEmpty from 'lodash/isEmpty'
+import { navigate } from 'common/router'
 
 class MatchesContainer extends PureComponent {
   componentDidUpdate (prevProps) {
@@ -18,6 +19,7 @@ class MatchesContainer extends PureComponent {
     return (
       <Matches
         {...this.props}
+        navigate={this.props.navigate}
       />
     )
   }
@@ -27,13 +29,14 @@ export default compose(
   withRouter,
   connect((state, props) => ({
     uuid: get(props, 'match.params.uuid')
-  })),
+  }), {
+    navigate,
+  }),
   connectResource({
     namespace: 'matches',
     endpoint: 'companies/:uuid?/matches',
-    prefetch: false,
-    requestPromise: true,
-    list: false
+    list: false,
+    refresh: true,
   }),
   connectResource({
     namespace: 'companies',
