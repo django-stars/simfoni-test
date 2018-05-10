@@ -20,6 +20,8 @@ import merge from 'lodash/merge'
 import values from 'lodash/values'
 import isEmpty from 'lodash/isEmpty'
 
+import { push, replace } from 'react-router-redux'
+
 // TODO
 // + OPTIONS request
 // + errors handling
@@ -45,6 +47,13 @@ export const SET_DATA = '@ds-resource/set-data'
 export const SET_ERRORS = '@ds-resource/set-errors'
 export const SET_LOADING = '@ds-resource/set-loading'
 export const SET_FILTERS = '@ds-resource/set-filters'
+export const CLEAR_RESOURCES = '@ds-resource/clear-resoureces'
+
+export function clearResources () {
+  return {
+    type: CLEAR_RESOURCES
+  }
+}
 
 export function request (payload, meta) {
   return {
@@ -177,7 +186,8 @@ export function connectResource (resource, options = {}) {
       const restActions = {
         setData: payload => setData(payload, meta),
         setErrors: payload => setErrors(payload, meta),
-        setFilters: payload => setFilters(payload, meta)
+        setFilters: payload => setFilters(payload, meta),
+        clearResources
       }
 
       const actions = {
@@ -272,13 +282,6 @@ function makePrefetchHOC (resource) {
       }
 
       render () {
-        const hasData = this.props[resource.namespace].data !== null
-        const hasOptions = this.props[resource.namespace].options !== null
-
-        if (!resource.async && (!hasData || (resource.options && !hasOptions))) {
-          return null // TODO loading
-        }
-
         return <ComposedComponent {...this.props} />
       }
     }
@@ -291,6 +294,8 @@ const defaultState = {
 
 export function reducer (state = defaultState, { type, payload = {}, meta = {}, error = false }) {
   switch (type) {
+    case CLEAR_RESOURCES:
+      return defaultState
     case SET_ERRORS:
     case SET_DATA: {
       const currentData = state[meta.resource.namespace]
@@ -355,41 +360,54 @@ export function reducer (state = defaultState, { type, payload = {}, meta = {}, 
   return state
 }
 
+function buildPromise (meta, payload, store, API) {
+  const { type, props, resource } = meta
+  let endpoint = resource.endpoint
+  if (!(new RegExp(`(:${resource.idKey})\\W`, 'g').test(endpoint))) {
+    // automatically set '/:id?' to endpoint
+    endpoint += `/:${resource.idKey}?`
+  }
+  const toPath = pathToRegexp.compile(endpoint)
+  const isListItem = !resource.item && resource.list && ['PATCH', 'PUT', 'DELETE'].includes(type)
+  let itemId = (isListItem ? payload : props)[resource.idKey]
+  endpoint = toPath({ ...props, [resource.idKey]: itemId })
+  const query = resource.list && !hasId && !isListItem
+  // FIXME need to find another way to get current filters
+  const hasId = props[resource.idKey]
+        ? selectResource(resource)(store.getState()).filters
+        : undefined
+
+  if (resource.multiple) {
+    return Promise.all(
+      payload.map(item => {
+        const endpoint_ = pathToRegexp.compile(resource.endpoint)(item)
+        return API(endpoint_).request(type, undefined, item)
+      })
+    )
+  }
+  return API(endpoint).request(type, query, payload)
+}
+
 function requestEpic (action$, store, { API }) { // FIXME API
   return action$.ofType(REQUEST)
     // .debounce(() => interval(100)) // FIXME: FAIL on different requests types
     .mergeMap(function ({ meta, payload }) {
       const { type, props, resource } = meta
-
       const isListItem = !resource.item && resource.list && ['PATCH', 'PUT', 'DELETE'].includes(type)
-      let itemId = (isListItem ? payload : props)[resource.idKey]
-
-      let endpoint = resource.endpoint
-      if (!(new RegExp(`(:${resource.idKey})\\W`, 'g').test(endpoint))) {
-        // automatically set '/:id?' to endpoint
-        endpoint += `/:${resource.idKey}?`
-      }
-      const toPath = pathToRegexp.compile(endpoint)
-      endpoint = toPath({ ...props, [resource.idKey]: itemId })
       const submitting = resource.form && ['POST', 'PATCH', 'PUT', 'DELETE'].includes(type)
-
-      // FIXME need to find another way to get current filters
-      const hasId = Boolean(props[resource.idKey])
-      const query = resource.list && !hasId && !isListItem
-        ? selectResource(resource)(store.getState()).filters
-        : undefined
       return concat(
         of(
           setLoading(+1, meta)
         ),
-        fromPromise(API(endpoint).request(type, query, payload))
+        fromPromise(buildPromise(meta, payload, store, API))
           .switchMap(response => of(
             // TODO update list after create new item (GET after POST)
-            resource.requestPromise ? requestSuccess(response, meta) : isListItem
+            isListItem
               ? request(undefined, { ...meta, type: 'GET' })
               : setData(response, meta),
             setLoading(-1, meta),
-            submitting && meta.resource.navigateAfterSubmit
+            submitting && meta.resource.navigateAfterSubmit && push(meta.resource.navigateAfterSubmit),
+            requestSuccess(response, meta)
           ))
           .catch(err => of(
             setErrors(err.errors || err, meta),
@@ -407,6 +425,23 @@ function filterEpic (action$, store) {
         of(
           setFilters(payload, meta),
           request(undefined, { ...meta, type: 'GET' })
+        )
+      )
+    })
+}
+
+function navigateEpic (action$, store) {
+  return action$.ofType(SET_FILTERS)
+    .filter(({meta}) => meta.resource.useRouter)
+    .mergeMap(function ({ meta, payload }) {
+      return (
+        of(
+          replace({
+            pathname: store.getState().router.location.pathname,
+            search: buildQueryParams(
+              selectResource(meta.resource)(store.getState()).filters
+            )
+          })
         )
       )
     })
@@ -474,6 +509,7 @@ function parseOptions (options) {
 export const epic = combineEpics(
   requestEpic,
   filterEpic,
+  navigateEpic,
   promiseResolveEpic
 )
 

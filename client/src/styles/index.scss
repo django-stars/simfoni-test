@@ -1,8 +1,7 @@
 @import 'bootstrap';
 @import './layout';
-@import './dashboard';
-@import './components';
-
+@import './elements';
+@import './list';
 
 html, body, #root {
   height: 100%;

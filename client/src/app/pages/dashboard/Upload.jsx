@@ -1,43 +1,45 @@
+import { Fragment } from 'react'
 import { FileInputField } from 'common/forms/fields'
-import { Collapse } from 'reactstrap'
+import { Col, Button } from 'reactstrap'
+import Loader from 'react-loader-spinner'
+import Progress from './Progress'
 import isEmpty from 'lodash/isEmpty'
 import get from 'lodash/get'
 
-export default function Upload ({ handleSubmit, upload }) {
+export default function Upload ({ handleSubmit, upload, pristine, submitting, onSubmit }) {
   const { min = 0, max = 0, skipped = 0, imported = 0 } = get(upload, 'data', {}) || {}
   return (
-    <form className='upload-container' onSubmit={handleSubmit}>
-      <FileInputField name='file' fieldLabel='Upload files' />
-      <Collapse isOpen={!isEmpty(upload.data)}>
-        <div className='file-info'>
-          <div className='title-row'>
-            <h4>Data details</h4>
-          </div>
-          <div className='file-details'>
-            <FileInfo
-              name='Records'
-              value={`${(imported - skipped).toLocaleString('en-IN')} of ${imported.toLocaleString('en-IN')}`}
-            />
-            <FileInfo
-              name='Min'
-              value={min.toLocaleString('en-IN')}
-            />
-            <FileInfo
-              name='Max'
-              value={max.toLocaleString('en-IN')}
-            />
-          </div>
+    <Col xs='1' className='sidebar'>
+      <form className='upload-container' onSubmit={handleSubmit(onSubmit)}>
+        <FileInputField name='file' fieldLabel='Data details' />
+        <div className='file-info-pannnel'>
+          {
+            !pristine && <Button className='btn-bg' color='primary' disabled={submitting}>
+              <span>Start process</span>
+              {submitting && <Loader type='Oval' color='#1a98f8' height='19' width='19' />}
+            </Button>
+          }
+          {
+            !(isEmpty(get(upload, 'data'))) && (
+              <Fragment>
+                <InfoItem title='Total' value={get(upload, 'data.imported')} />
+                <InfoItem title='Normalized' value={get(upload, 'data.normalized')} />
+                <InfoItem title='Duplicate' value={get(upload, 'data.duplicate')} />
+              </Fragment>
+            )
+          }
+          <Progress />
         </div>
-      </Collapse>
-    </form>
+      </form>
+    </Col>
   )
 }
 
-function FileInfo ({ value, name }) {
+function InfoItem ({ title, value}) {
   return (
-    <div className='file-info-item'>
-      <h5>{value}</h5>
-      <span>{name}</span>
+    <div className='info-item'>
+      <h4>{title}</h4>
+      <h3>{value}</h3>
     </div>
   )
 }

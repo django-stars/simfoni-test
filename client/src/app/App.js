@@ -1,11 +1,17 @@
 import { Provider } from 'react-redux'
-import Dashboard from 'pages/dashboard'
+import { ConnectedRouter } from 'react-router-redux'
 import { hot } from 'react-hot-loader'
 
-function AppProvider ({ store }) {
+import routes from './routes'
+import { RouteRecursive } from 'common/router'
+
+
+function AppProvider({ store, history }) {
   return (
     <Provider store={store}>
-      <Dashboard />
+      <ConnectedRouter history={history}>
+        <RouteRecursive routes={routes} />
+      </ConnectedRouter>
     </Provider>
   )
 }

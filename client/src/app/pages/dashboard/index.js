@@ -1,3 +1,5 @@
-import Dashboard from './Dashboard'
+import routes from './routes'
 
-export default Dashboard
+export {
+  routes,
+}
