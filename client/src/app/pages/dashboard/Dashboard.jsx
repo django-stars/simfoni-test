@@ -1,16 +1,13 @@
-import { AppLayout } from 'layouts'
-import ChartContainer from './ChartContainer'
+import { Row } from 'reactstrap'
 import UploadContainer from './UploadContainer'
-import FormGroupsContainer from './FormGroupsContainer'
+import CompaniesContainer from './CompaniesContainer'
 
-export default function (props) {
+export default function Dashboard ({ children }) {
   return (
-    <AppLayout>
-      <div className='form-container'>
-        <UploadContainer />
-        <FormGroupsContainer />
-      </div>
-      <ChartContainer />
-    </AppLayout>
+    <Row className='main'>
+      <UploadContainer />
+      <CompaniesContainer />
+      { children }
+    </Row>
   )
 }

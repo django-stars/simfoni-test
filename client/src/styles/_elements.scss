@@ -1,0 +1,244 @@
+.app_logo {
+  background: url('../img/logo.svg');
+  width: 115px;
+  height: 30px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: block;
+}
+
+.btn.btn-bg {
+  font-weight: 600;
+  font-size: 15px;
+  padding: 15px 35px;
+  line-height: 19px;
+  &.btn-primary {
+    border: dashed 1px $blue;
+    color: $blue
+  }
+}
+
+.file-info-pannnel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  >button.btn.btn-bg {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: no-wrap;
+    line-height: 15px;
+    padding: 15px 0;
+    margin: 30px 8px;
+    align-self: stretch;
+    flex-shrink: 0;
+    >div {
+      margin: 0 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    border-bottom: 1px solid $gray-400;
+    padding: 25px 0;
+    flex-shrink: 0;
+    h4 {
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.67;
+      letter-spacing: normal;
+      text-align: center;
+      color: $gray-500;
+      margin-bottom: 0;
+    }
+    h3 {
+      font-size: 26px;
+      text-align: center;
+      color: $gray-800;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.file-input-label {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid $gray-400;
+  padding: 0 8px 25px 8px;
+  margin: 0;
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.6;
+    color: $dark;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .file-selector {
+    flex: 1;
+    display: flex;
+
+    button {
+      flex: 1;
+      border: dashed 1px $green;
+      color: $green;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 15px 35px;
+      align-self: stretch;
+      line-height: 19px;
+    }
+  }
+  >span {
+    font-size: 13px;
+    color: $gray-200;
+    margin-top: 5px;
+  }
+}
+
+.sidebar {
+  display: flex;
+  min-width: 200px;
+  max-width: 200px;
+  padding: 0;
+  .upload-container {
+    max-height: 100%;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-self: stretch;
+    border-right: 1px solid $gray-400;
+  }
+  .form-group {
+    margin-bottom: 0;
+  }
+}
+
+.CircularProgressbar {
+  .CircularProgressbar-path {
+    stroke: $blue;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease 0s;
+  }
+  .CircularProgressbar-trail {
+    stroke: $blue;
+    opacity:  0.3;
+  }
+  .CircularProgressbar-text {
+    fill: $gray-800;
+    dominant-baseline: middle;
+    text-anchor: middle;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+.proggress {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 0;
+  span {
+    margin-top: 20px;
+    font-size: 13px;
+    color: $gray-500;
+  }
+  b {
+    font-weight: 400;
+    color: $gray-800
+  }
+}
+
+.companies {
+  background: $primary;
+  padding: 0;
+  border-right: 1px solid $gray-400;
+  display: flex;
+  flex-direction: column;
+  .table tbody tr td {
+    padding: 0;
+  }
+}
+
+.matches {
+  flex: 1;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  footer {
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 14px;
+    color: $gray-500;
+    background: #fff;
+    border-top: 1px solid $gray-400;
+    padding: 0 30px;
+    .material-icons {
+      font-size: 20px;
+      margin: 0 5px;
+    }
+    .btn {
+      font-size: 14px;
+      margin-left: 22px;
+    }
+  }
+  .actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    .btn {
+      font-size: 14px;
+      padding: 3px 28px;
+      background: #fff;
+      &.btn-success {
+        color: $success;
+        &:hover {
+          background: $success;
+          color: #fff;
+          border-color: $success;
+        }
+      }
+      &.btn-danger {
+        color: $danger;
+        &:hover {
+          background: $danger;
+          color: #fff;
+          border-color: $danger;
+        }
+      }
+    }
+  }
+}
+
+.empty {
+  background: url('../img/logo_big.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  flex: 1;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  h4 {
+    opacity: 0.6;
+    font-size: 18px;
+    text-align: center;
+    color: $gray-200;
+  }
+}

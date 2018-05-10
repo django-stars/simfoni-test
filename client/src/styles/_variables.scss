@@ -3,7 +3,8 @@
 // Variables should follow the `$component-state-property-size` formula for
 // consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
 
-$header-height: 70px;
+$header-height: 60px;
+$footer-height: 48px;
 
 //
 // Color system
@@ -12,15 +13,15 @@ $header-height: 70px;
 // stylelint-disable
 $white:    #fff !default;
 $gray-100: #f8f9fa !default;
-$gray-200: #e9ecef !default;
+$gray-200: #214159;
 $gray-300: #dee2e6 !default;
-$gray-400: #ced4da !default;
-$gray-500: #adb5bd !default;
+$gray-400: #e7e7e7;
+$gray-500: #7f8fa4;
 $gray-600: #6c757d !default;
 $gray-700: #495057 !default;
-$gray-800: #343a40 !default;
+$gray-800: #001b3f;
 $gray-900: #212529 !default;
-$black:    #003e70;
+$black:    #000 !default;
 
 $grays: () !default;
 $grays: map-merge((
@@ -35,14 +36,14 @@ $grays: map-merge((
   "900": $gray-900
 ), $grays);
 
-$blue:    #ebf6ff;
+$blue:    #1a98f8;
 $indigo:  #6610f2 !default;
 $purple:  #6f42c1 !default;
 $pink:    #e83e8c !default;
 $red:     #dc3545 !default;
 $orange:  #fd7e14 !default;
 $yellow:  #ffc107 !default;
-$green:   #35cc5b;
+$green:   #3bc027;
 $teal:    #20c997 !default;
 $cyan:    #17a2b8 !default;
 
@@ -63,12 +64,12 @@ $colors: map-merge((
   "gray-dark":  $gray-800
 ), $colors);
 
-$primary:       #2196f3 ;
-$secondary:     $green;
-$success:       $green !default;
+$primary:       #f2f9ff;
+$secondary:     #e9ffe6;
+$success:       #02b02d;
 $info:          $cyan !default;
 $warning:       $yellow !default;
-$danger:        $red !default;
+$danger:        #f54f4f;
 $light:         $gray-100 !default;
 $dark:          $gray-800 !default;
 
@@ -206,7 +207,7 @@ $line-height-lg:              1.5 !default;
 $line-height-sm:              1.5 !default;
 
 $border-width:                1px !default;
-$border-color:                #ebf7ff;
+$border-color:                $gray-300 !default;
 
 $border-radius:               .25rem !default;
 $border-radius-lg:            .3rem !default;
