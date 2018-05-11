@@ -19,6 +19,7 @@ class BaseDataImporter(abc.ABC):
         print(importer.report)
     """
     WRONG_FILE_CONTENT_MESSAGE = _('Invalid file content. Please check amount of columns & headers naming.')
+    EMPTY_FILE = _('File contains no rows.')
 
     def __init__(self, source_file, template):
         """
@@ -50,7 +51,11 @@ class BaseDataImporter(abc.ABC):
         """
         if not self._is_valid:
             self._iterator = self._get_rows_iterator()
-            header_row = next(self._iterator)
+            try:
+                header_row = next(self._iterator)
+            except StopIteration:
+                raise serializers.ValidationError(self.EMPTY_FILE)
+
             try:
                 # We need to remove unused trailing cells.
                 # But first we need ensure that we have all not less then expect

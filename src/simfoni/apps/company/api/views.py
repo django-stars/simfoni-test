@@ -55,7 +55,7 @@ class FlushCompaniesAPIView(APIView):
 
 
 class CompaniesListAPIView(generics.ListAPIView):
-    queryset = Company.objects.all()
+    queryset = Company.objects.all()  # companies without matches are deleted by signal
     serializer_class = CompanySerializer
 
 
@@ -73,8 +73,11 @@ class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
         response = super().update(request, *args, **kwargs)
 
         # in addition we need to drop all other matches for raw company record
+        # also there is a post_delete signal for Match object which will remove Companies without matches
         instance = self.get_object()
         if instance.is_accepted:
-            instance.raw_company.matches.filter(company=instance).exclude(pk=instance.uuid).delete()
-            # also there is a post_delete signal for Match object which will remove Companies without matches
+            instance.raw_company.matches.filter(company=instance.company).exclude(pk=instance.uuid).delete()
+            if not instance.company.matches.exclude(is_accepted=True).exists():
+                instance.company.is_completed = True
+                instance.company.save()
         return response

@@ -73,6 +73,9 @@ def match_companies(raw_companies):
     # create Match objects
     _match(processed_names.values(), companies_cache)
 
+    # update is_completed info for companies which already were in db
+    Company.objects.filter(is_completed=True, matches__is_accepted=False).update(is_completed=False)
+
     # collect statistic
     processed_names_count = len(processed_names.keys())
     return {

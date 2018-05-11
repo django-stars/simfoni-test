@@ -6,7 +6,7 @@ from cleanco import cleanco
 MAX_INPUT_LENGTH = 25
 
 
-SPECILA_CHARS = [
+SPECIAL_CHARS = [
     r'\!', r'\"', r'\#', r'\$', r'\%', r'\&', r'\'', r'\(', r'\)', r'*',
     r'\+', r'\,', r'\-', r'\.', r'\/', r'\:', r'\;', r'\<', r'\=', r'\>',
     r'\?', r'\@', r'\[', r'\\', r'\]', r'\^', r'\_', r'\`', r'\{',
@@ -54,7 +54,7 @@ def remove_duplicate_spaces(value):
 
 
 def remove_special_characters(value):
-    return re.sub("[{}]".format("".join(SPECILA_CHARS)), ' ', value)
+    return re.sub("[{}]".format("".join(SPECIAL_CHARS)), ' ', value)
 
 
 def remove_corporate_cleanco(value):
@@ -87,7 +87,6 @@ def remove_the(value):
 PIPELINE = [
     set_upper, guess_ending, trim_spaces, remove_the, remove_duplicate_spaces,
     remove_cp_and_friends, remove_special_characters, remove_corporate_cleanco,
-    remove_corporate_cleanco,
     trim_spaces, remove_duplicate_spaces, set_title,
 ]
 

@@ -5,14 +5,14 @@ from company.models import Company, RawCompany, Match
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ('name', )
+    list_display = ('name', 'is_completed', )
     search_fields = ('name', )
 
 
 @admin.register(RawCompany)
 class RawCompanyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'cleaned_name', )
-    search_fields = ('name', 'cleaned_name', )
+    list_display = ('name', )
+    search_fields = ('name', )
 
 
 @admin.register(Match)
