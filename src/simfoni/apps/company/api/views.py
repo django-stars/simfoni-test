@@ -76,7 +76,7 @@ class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
         # also there is a post_delete signal for Match object which will remove Companies without matches
         instance = self.get_object()
         if instance.is_accepted:
-            instance.raw_company.matches.filter(company=instance.company).exclude(pk=instance.uuid).delete()
+            instance.raw_company.matches.exclude(pk=instance.uuid).delete()
             if not instance.company.matches.exclude(is_accepted=True).exists():
                 instance.company.is_completed = True
                 instance.company.save()
