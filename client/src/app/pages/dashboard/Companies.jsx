@@ -18,7 +18,7 @@ export default function Companies ({ companies = {} }) {
   return (
     <Col xs='2' className='companies'>
       <SortableTable
-        data={(get(companies, 'data', []) || []).filter(item => item.is_completed)}
+        data={(get(companies, 'data', []) || []).filter(item => !item.is_completed)}
         headers={headers}
         minHeight={(target) => target.innerHeight - 60}
         joinToName='name'
