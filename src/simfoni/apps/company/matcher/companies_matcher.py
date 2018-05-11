@@ -80,5 +80,4 @@ def match_companies(raw_companies):
     processed_names_count = len(processed_names.keys())
     return {
         'normalized': processed_names_count,
-        'duplicate': len(raw_companies) - processed_names_count
     }

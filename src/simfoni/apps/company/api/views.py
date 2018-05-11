@@ -31,11 +31,11 @@ class UploadCompaniesAPIView(APIView):
             importer = OpenpyxlDataImporter(serializer.validated_data['file'], self.IMPORTER_TEMPLATE)
             if importer.is_valid(raise_exception=True):
                 importer.parse()  # saves rows to db
-
                 match_report = match_companies(RawCompany.objects.filter(matches=None))
 
                 report = deepcopy(importer.report)
                 report.update(match_report)
+                report['duplicate'] = report['imported'] - report['normalized']
                 return Response(report, status=status.HTTP_200_OK)
 
 
@@ -55,14 +55,14 @@ class FlushCompaniesAPIView(APIView):
 
 
 class CompaniesListAPIView(generics.ListAPIView):
-    queryset = Company.objects.all()  # companies without matches are deleted by signal
+    queryset = Company.objects.all().order_by('name')  # companies without matches are deleted by signal
     serializer_class = CompanySerializer
 
 
 class CompanyMatchesListAPIView(APIView):
     def get(self, request, pk, *args, **kwargs):
         company = get_object_or_404(Company, pk=pk)
-        return Response(MatchSerializer(company.matches.filter(is_accepted=False), many=True).data)
+        return Response(MatchSerializer(company.matches.filter(is_accepted=False).order_by('-score'), many=True).data)
 
 
 class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
