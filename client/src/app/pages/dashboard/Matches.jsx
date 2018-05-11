@@ -47,8 +47,8 @@ export default class Matches extends PureComponent {
 
   @autobind
   accept(companies=[]) {
-    return () => {
-      this.setState({loading: 1}, ()=>{
+    return (event) => {
+      this.setState({loading: (event.target.className || '').includes('withloader') ? 1 : 0}, ()=>{
         this.props.currentMatch.update(companies.map(item=>({...item, is_accepted: true})), { multiple: true, endpoint: 'matches/:uuid?' })
           .then( _ => {
             this.setState({loading: 0})
@@ -68,8 +68,8 @@ export default class Matches extends PureComponent {
 
   @autobind
   decline(companies=[]) {
-    return () => {
-      this.setState({loading: -1}, ()=>{
+    return (event) => {
+      this.setState({loading: (event.target.className || '').includes('withloader') ? -1 : 0}, ()=>{
         this.props.currentMatch.remove(companies, { multiple: true, endpoint: 'matches/:uuid?' })
           .then( _ => {
             this.setState({loading: 0})
@@ -103,12 +103,14 @@ export default class Matches extends PureComponent {
         <footer>
           Apply changes to all matched companies <i className="material-icons">arrow_forward</i>
           <Button
+            className="withloader"
             disabled={isEmpty(get(this.props, 'matches.data', [])) || !!this.state.loading}
             color="success" onClick={this.accept(get(this.props, 'matches.data', []))}
           >
             Accept All{this.state.loading === 1 && <Loader type='Oval' color='#fff' height='14' width='14' />}
           </Button>
           <Button
+            className="withloader"
             disabled={isEmpty(get(this.props, 'matches.data', [])) || !!this.state.loading}
             color="danger" onClick={this.decline(get(this.props, 'matches.data', []))}
           >
