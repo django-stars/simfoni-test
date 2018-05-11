@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals
 
 from rest_framework import status, generics
@@ -89,7 +90,13 @@ class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
         # On each delete we also need to make 'is_completed' check
         instance = self.get_object()
         response = super().delete(request, *args, **kwargs)
-        self._update_company_is_completed(instance)
+
+        # we have a post_delete signal so if it was a last match - the access to company will raise DoesNotExists
+        try:
+            self._update_company_is_completed(instance)
+        except ObjectDoesNotExist:
+            pass
+
         return response
 
 
