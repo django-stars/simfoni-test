@@ -13,27 +13,19 @@ SPECIAL_CHARS = [
     r'\|', r'\}', r'\~']
 
 
-# 134 unique. -> cleanco provide 306 variants
+# from provided file, 134 unique. -> cleanco provide 306 variants
 COMPANY_EXT = [
-    'AB', 'AB', 'A.C.', 'ACE', 'AD', 'AE', 'AG', 'AG', 'AG', 'AL', 'AmbA',
-    'ANS', 'Apb', 'ApS', 'AS', 'A/S', 'A.S.', 'A.S.', 'A.S.', 'A.S.', 'ASA',
-    'AVV', 'Bpk', 'Bt', 'B.V.', 'B.V.', 'B.V.', 'BVBA', 'CA', 'Corp.',
-    'C.V.', 'CVA', 'CVoA', 'DA', 'd/b/a', 'd.d.', 'd.d.', 'd.n.o.', 'd.o.o.',
-    'd.o.o.', 'EE', 'EEG', 'EIRL', 'ELP', 'EOOD', 'EPE', 'EURL', 'e.V.',
-    'GbR', 'GCV', 'GesmbH', 'GIE', 'GmbH', 'GmbH', 'GmbH', 'HB', 'hf', 'IBC',
-    'Inc.', 'Inc', 'I/S', 'j.t.d.', 'KA/S', 'Kb', 'Kb', 'KD', 'k.d.', 'k.d.',
-    'KDA', 'k.d.d.', 'Kft', 'KG', 'KG', 'KGaA', 'KK', 'Kkt', 'k.s.', 'K/S',
-    'KS', 'Kv', 'Ky', 'Lda', 'LDC', 'LLC', 'LLP', 'Ltd.', 'Ltda', 'Ltée.',
-    'N.A.', 'NT', 'NV', 'NV', 'NV', 'NV', 'OE', 'OHG', 'OHG', 'OOD', 'OÜ',
-    'Oy', 'OYJ', 'P/L', 'PLC', 'PMA', 'PMDN', 'PrC', 'PT', 'Pty.', 'RAS',
-    'Rt', 'S/A', 'SA', 'SA', 'SA', 'sa', 'SA', 'SA', 'SA', 'SA', 'SA', 'SA',
-    'SA', 'S.A.', 'SAFI', 'S.A.I.C.A.', 'SApA', 'Sarl', 'Sarl', 'SAS', 'SC',
-    'SC', 'S.C.', 'SCA', 'SCA', 'SCP', 'SCS', 'S.C.S.', 'SCS', 'SENC', 'SGPS',
-    'SK', 'SNC', 'SNC', 'SNC', 'SNC', 'SOPARFI', 'sp', 'SpA', 'SPRL', 'Srl',
-    'Srl', 'Srl', 'Srl', 'Srl', 'td', 'TLS', 'VEB', 'VOF', 'v.o.s.',
-    'Kol. SrK', 'Kom. SrK', 'PC Ltd', 'Prp. Ltd.', 'Sdn Bhd', 'spol s.r.o.',
-    'Sp. z.o.o.', 'A. en P.', 'S. de R.L.', 'S. en C.', 'S. en N.C.',
-    'SA de CV', 'ApS & Co. K/S', 'GmbH & Co. KG'
+    'sp', 'e.V.', 'AL', 'PMA', 'SPRL', 'ASA', 'ACE', 'S.C.S.', 'Bt', 'SCP', 'GIE', 'OÜ', 'IBC', 'EOOD',
+    'SCA', 'RAS', 'LLC', 'I/S', 'Ltd.', 'd.o.o.', 'OYJ', 'TLS', 'AD', 'EEG', 'LDC', 'B.V.', 'GbR', 'NV',
+    'Ky', 'NT', 'SApA', 'EIRL', 'A. en P.', 'LLP', 'VOF', 'S.A.I.C.A.', 'ELP', 'Bpk', 'Pty.', 'd.n.o.',
+    'td', 'Apb', 'ANS', 'SOPARFI', 'SpA', 'CVoA', 'SAS', 'S. en C.', 'P/L', 'A.S.', 'k.d.d.', 'Ltda',
+    'EPE', 'Kv', 'Srl', 'Oy', 'PC Ltd', 'Kkt', 'S.A.', 'hf', 'Inc', 'PT', 'SENC', 'd.d.', 'Inc.', 'EURL',
+    'PMDN', 'k.s.', 'A/S', 'AVV', 'DA', 'KA/S', 'OHG', 'S.C.', 'AB', 'KGaA', 'AmbA', 'KK', 'PrC', 'VEB',
+    'S. de R.L.', 'KG', 'K/S', 'AE', 'j.t.d.', 'Kol. SrK', 'Sarl', 'sa', 'Sdn Bhd', 'AS', 'Prp. Ltd.', 'CA',
+    'Corp.', 'PLC', 'S. en N.C.', 'SCS', 'SA', 'GCV', 'CVA', 'SK', 'SAFI', 'GmbH', 'KDA', 'EE', 'v.o.s.',
+    'ApS', 'Lda', 'spol s.r.o.', 'N.A.', 'SGPS', 'S/A', 'Kom. SrK', 'GmbH & Co. KG', 'A.C.', 'Kft', 'KD',
+    'Sp. z.o.o.', 'BVBA', 'k.d.', 'd/b/a', 'Kb', 'KS', 'C.V.', 'SA de CV', 'ApS & Co. K/S', 'AG', 'SC',
+    'HB', 'OOD', 'Ltée.', 'GesmbH', 'SNC', 'OE', 'Rt',
 ]
 
 
