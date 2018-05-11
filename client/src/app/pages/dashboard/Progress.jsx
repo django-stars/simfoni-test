@@ -8,7 +8,7 @@ class Progress extends PureComponent {
   render () {
     const { companies } = this.props
     const imported = companies.length
-    const displayed = companies.filter(({ is_completed }) => !is_completed).length
+    const normalized = companies.filter(({ is_completed }) => is_completed).length
     if (isEmpty(companies)) return null
     return (
       <div className='proggress' style={{minHeight: '160px'}}>
