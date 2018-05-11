@@ -55,7 +55,7 @@ class FlushCompaniesAPIView(APIView):
 
 
 class CompaniesListAPIView(generics.ListAPIView):
-    queryset = Company.objects.all().order_by('name')  # companies without matches are deleted by signal
+    queryset = Company.objects.exclude(matches=None).order_by('name')
     serializer_class = CompanySerializer
 
 

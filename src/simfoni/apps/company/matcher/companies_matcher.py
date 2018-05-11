@@ -15,8 +15,7 @@ def _match(processed_names, companies_cache):
         names_to_match = []
         for name_info in processed_names:
             # check is this name is similar. If we find at least 1 common word - we build a match.
-            # Skip matching if word is 1 letter.
-            if any(part in name_info.parts for part in current_name_info.parts if len(part) > 1):
+            if any(part in name_info.parts for part in current_name_info.parts):
                 # similar, need to determine correct order info.
                 matched_words = tuple(part for part in name_info.parts if part in current_name_info.parts)
                 correct_order = matched_words == current_name_info.parts or len(matched_words) == 1
@@ -72,7 +71,6 @@ def match_companies(raw_companies):
 
     # create Match objects
     _match(processed_names.values(), companies_cache)
-
     # update is_completed info for companies which already were in db
     Company.objects.filter(is_completed=True, matches__is_accepted=False).update(is_completed=False)
 
