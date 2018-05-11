@@ -1,6 +1,6 @@
 import { PureComponent, Fragment } from 'react'
 import { Col, Button } from 'reactstrap'
-import SortableTable, { BooleanColumn, Actions } from 'common/widgets/SortableTable'
+import SortableTable, { BooleanColumn, Actions, Score } from 'common/widgets/SortableTable'
 import { autobind } from 'core-decorators'
 import get from 'lodash/get'
 import isEmpty from 'lodash/isEmpty'
@@ -16,11 +16,12 @@ const headers = [
     name: 'Score',
     key: 'score',
     sortable: true,
-    resizable: true
+    resizable: true,
+    formatter: Score
   },
   {
      name: 'Order',
-     key: 'is_accepted',
+     key: 'correct_order',
      sortable: true,
      formatter: BooleanColumn,
      resizable: true

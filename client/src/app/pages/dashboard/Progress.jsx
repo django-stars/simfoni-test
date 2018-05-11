@@ -13,12 +13,12 @@ class Progress extends PureComponent {
     return (
       <div className='proggress' style={{minHeight: '160px'}}>
         <CircularProgressbar
-          percentage={parseInt((imported - displayed) * 100 / imported, 10)}
+          percentage={parseInt(normalized / imported * 100, 10)}
           strokeWidth={10}
           initialAnimation
           radius={40}
         />
-        {/*<span>Duplicate processed <b>{parseInt(displayed / imported * 100, 10)}%</b></span>*/}
+        <span>Duplicate processed <b>{parseInt(normalized / imported * 100, 10)}%</b></span>
       </div>
     )
   }

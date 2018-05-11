@@ -107,3 +107,7 @@ export function Actions ({ value: { data, props } }) {
     </div>
   )
 }
+
+export function Score ({ value }){
+  return <div style={{color: parseInt(value,10) >= 50 ? '#3bc027' : '#f54f4f'}}>{value}</div>
+}

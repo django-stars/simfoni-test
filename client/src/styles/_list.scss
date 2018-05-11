@@ -76,9 +76,12 @@
 }
 
 .matches {
-  .react-grid-Container .react-grid-Canvas {
+  .react-grid-Container .react-grid-Canvas > div {
     >div:nth-child(odd) {
-      background: $primary;
+      background: #fcfcfc;
+    }
+    >div:nth-child(even) {
+      background: #fff;
     }
   }
 }
