@@ -69,6 +69,11 @@ class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Match.objects.all()
     serializer_class = MatchAcceptSerializer
 
+    def _update_company_is_completed(self, instance):
+        if not instance.company.matches.exclude(is_accepted=True).exists():
+            instance.company.is_completed = True
+            instance.company.save()
+
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
 
@@ -77,7 +82,14 @@ class MatchUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         if instance.is_accepted:
             instance.raw_company.matches.exclude(pk=instance.uuid).delete()
-            if not instance.company.matches.exclude(is_accepted=True).exists():
-                instance.company.is_completed = True
-                instance.company.save()
+            self._update_company_is_completed(instance)
         return response
+
+    def delete(self, request, *args, **kwargs):
+        # On each delete we also need to make 'is_completed' check
+        instance = self.get_object()
+        response = super().delete(request, *args, **kwargs)
+        self._update_company_is_completed(instance)
+        return response
+
+
