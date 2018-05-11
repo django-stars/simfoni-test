@@ -25,7 +25,7 @@ def _match(processed_names, companies_cache):
 
         # calculate score & create Match object
         for match_info in names_to_match:
-            score = _get_score(current_name_info.name, match_info)
+            score = _get_score(current_name_info, match_info)
             matches.append(Match(
                 score=score,
                 correct_order=match_info.is_correct_order,
@@ -36,12 +36,16 @@ def _match(processed_names, companies_cache):
     Match.objects.bulk_create(matches)
 
 
-def _get_score(current_name, match_info):
-    if current_name == match_info.name_info.name:
+def _get_score(current_name_info, match_info):
+    if current_name_info.name == match_info.name_info.name:
         return 100
     else:
         matched_words = len(match_info.matched_words)
-        all_words = len(match_info.name_info.parts)
+        # pick the biggest length, so 'American Stainless Tubing' with 'STAINLESS' will give 33.33% (instead of 100)
+        match_words = len(match_info.name_info.parts)
+        current_words = len(current_name_info.parts)
+        all_words = match_words if match_words > current_words else current_words
+
         return (matched_words / all_words) * 100
 
 
@@ -71,6 +75,7 @@ def match_companies(raw_companies):
 
     # create Match objects
     _match(processed_names.values(), companies_cache)
+
     # update is_completed info for companies which already were in db
     Company.objects.filter(is_completed=True, matches__is_accepted=False).update(is_completed=False)
 
