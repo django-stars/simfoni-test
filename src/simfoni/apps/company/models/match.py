@@ -34,7 +34,7 @@ def remove_companies_without_match(sender, instance, **kwargs):
         if not instance.company.matches.all().exists():
             instance.company.delete()
     except ObjectDoesNotExist:
-        # instance.company could raise exception if there is no company
+        # instance.company could raise exception if company was deleted (cascade deletion of match has been triggered)
         pass
 
 
