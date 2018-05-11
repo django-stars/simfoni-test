@@ -1,6 +1,10 @@
 .react-grid-Container {
   .react-grid-Header {
     .react-grid-HeaderCell {
+      .pull-right {
+        margin-left: 3px;
+        font-size: 10px;
+      }
       padding: 0 30px;
       color: $gray-500;
       font-size: 12px;
