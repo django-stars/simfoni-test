@@ -15,14 +15,10 @@ class RawCompanyImportSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    is_completed = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
         fields = ('uuid', 'name', 'is_completed', )
-
-    def get_is_completed(self, instance):
-        return not instance.matches.filter(is_accepted=True).exists()
 
 
 class MatchSerializer(serializers.ModelSerializer):
